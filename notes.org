@@ -1,0 +1,2 @@
+Attributes values range from 0 to 4.
+(0=Never, 1=Seldom, 2=Averagely, 3=Frequently, 4=Always) [[https://medium.com/analytics-vidhya/a-logistic-model-for-predicting-divorce-rates-among-couples-implemented-using-the-statsmodel-api-763e03d29d68][source]]
