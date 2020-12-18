@@ -5,7 +5,7 @@ import urllib
 import pandas as pd
 import http.client
 import requests
-import time
+
 
 BASE_URL = 'http://it.wikipedia.org/'
 
@@ -175,12 +175,15 @@ def main():
         print('\t\t----- {} {}: {}/{}-----'.format(award, nation, idx, len(pages)))
         songs_urls = scrape_song_urls(page)
         print('Num of songs: {}'.format(len(songs_urls)))
-        df = scrape_songs(songs_urls)
-        df['award'] = [award] * df.shape[0]
-        df['nation'] = [nation] * df.shape[0]
-        path = '../data/scraped/disco-{}${}.csv'
-        df.to_csv(path.format(award, nation), index=False, quoting=csv.QUOTE_ALL, quotechar='"')
-        print('\ndataframe created.')
+        try:
+            df = scrape_songs(songs_urls)
+            df['award'] = [award] * df.shape[0]
+            df['nation'] = [nation] * df.shape[0]
+            path = 'data/scraped/disco-{}${}.csv'
+            df.to_csv(path.format(award, nation), index=False, quoting=csv.QUOTE_ALL, quotechar='"')
+            print('\ndataframe created.')
+        except Exception:
+            pass
 
 
 main()
