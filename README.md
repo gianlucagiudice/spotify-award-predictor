@@ -4,7 +4,7 @@ Dataset:
 
 https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks
 
-Il dataset integrato è il file "data/integrated_data.csv"
+Il dataset integrato è il file "data/songs.csv"
 
 ## Cose da scrivere nel file latex
 - Abbiamo preso il dataset di spotify
