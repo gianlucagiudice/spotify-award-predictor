@@ -1,5 +1,4 @@
 # Disco d'oro predictor
-
 Dataset:
 
 https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks
@@ -35,3 +34,13 @@ Il dataset integrato è il file "data/songs.csv"
     - Abbiamo fatto una join su titolo uguale e un artista che coincide nella lista degli artisti
 - Abbiamo trasformato la lista degli artisti in una stringa
 - Abbiamo fato il dump del tabase in formato csv
+
+## Osservazioni
+- Dal pairplot risulta che esiste correlazione tra alcune variabili (es loudness:energy)
+    - Questo è ancora più chiaro dalla matrice di covarianze
+- Dal pairplot possiamo osservare anche la distribuzione dei valori delle features
+    - Emerge che alcune features sono inutili: instrumentalness
+- Far notare che chiaramente non useremo la feature popularity per il training del modellos
+
+## Domande
+- Può essere un buon metodo fare un samplimng per motivi di data visualization avendo un numero di osservazioni molto ampio?

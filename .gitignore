@@ -41,3 +41,4 @@ vignettes/*.pdf
 # Custom
 .idea
 .
+.DS_Store

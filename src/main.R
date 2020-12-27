@@ -1,11 +1,13 @@
 # ---------- Libraries ----------
-#install.packages(c("plyr", "ggplot2", "readr", "caret", "dplyr"))
-library(plyr)
-library(ggplot2)
-library(readr)
-library(caret)
-library(dplyr)
-library(cowplot)
+libraries = c("plyr", "ggplot2", "readr", "caret", "dplyr", "GGally",
+              "ggcorrplot", "FactoMineR", "factoextra")
+#install.packages(c("FactoMineR", "factoextra"))
+if (FALSE){
+  install.packages(libraries)
+}
+for (library in libraries){
+  library(library, character.only = TRUE)
+}
 
 DPI = 300
 
@@ -18,16 +20,19 @@ data <- read_csv("data/songs.csv")
 print(data)
 # Drop not useful information
 data = subset(data, select=c(2:10, 12:17, 19:20, 22))
+print(data)
+
 # Rename columns
-data <- rename(data, c("award_type"="award"))
+data <- rename(data, c("award"="award_type"))
 # Change each column to correct datatype
 data <- transform(data, valence=as.numeric(valence))
 data$mode <- factor(data$mode)
-
-# Add labels to each song
+data$key <- factor(data$key)
+data$explicit <- factor(data$explicit)
+data$mode <- factor(data$mode)
 data$award <- !data$award == "null"
-data$award <- factor(data$award)
 head(data)
+
 # Songs after 2000
 data <- subset(data, year>2000)
 
@@ -73,6 +78,7 @@ ggsave("popularity_boxplot.png", plot = last_plot(), path = "images",
 # Assume we are interested in songs not completely unknown
 print(c("Popularity quantile:", quantile(data$popularity)))
 data <- subset(data, popularity>25)
+
 ggplot(data, aes(y=year, x=award)) + 
   ggtitle("Boxplot year award vs not award") +
   xlab("Award won") + ylab("Year") + 
@@ -95,41 +101,32 @@ ggsave("awards_distribution.png", plot = last_plot(), path = "images",
 seed = 830694 + 829664
 positive <- subset(data, award == TRUE)
 negative <- subset(data, award == FALSE)
-negative_sample <- sample_n(data, nrow(positve), seed=seed)
+negative_sample <- sample_n(data, nrow(positive), seed=seed)
 data_balanced = union(positive, negative_sample)
 
 
 # --------- Feature Visualization ----------
-# Keep only features
-df = subset(data_balanced, select=c(3:18))
+# Keep only numeric features 
+df = subset(data_balanced, select=c(3, 5:8, 10, 12, 13, 15:18))
+# Standardize
+X = as.data.frame(scale(df[1:ncol(df)-1], center = TRUE, scale = TRUE))
+y = df$award
+df = X
+df$award = y
+head(df)
+# Sample 500 random points for plot purpose
+df.sample <- sample_n(df, 500, seed=seed)
+ggpairs(df.sample, aes(colour = award, alpha = 0.2))
+ggsave("pairplot.png", plot = last_plot(), path = "images",
+       scale = 1.75, dpi = floor(DPI), limitsize = TRUE)
+# Remove useless feature
+df.effective = subset(df, select = c(1:5, 7:11))
+df.award = df$award
+corr <- cor(df.effective)
+ggcorrplot(corr)
+ggsave("correlation.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = floor(DPI), limitsize = TRUE)
 
-if(FALSE){
-x <- sample_n(df, 200, seed=seed)
-featurePlot(x = x[, 1:16], y = x$award, plot="pairs",
-            scales=list(x=list(relation="free"), y=list(relation="free")),
-            auto.key=list(columns=3))
-            
 
-featurePlot(x = df[, 1:16], y = df$award, plot = "pairs")
-
-
-featurePlot(x = df[,1:3], y = df$award, plot = "pairs")
-
-
-
-my_plots <- lapply(names(x), function(var_x){
-  p <- 
-    ggplot(x) +
-    aes_string(var_x)
-  
-  if(is.numeric(iris[[var_x]])) {
-    p <- p + geom_histogram() +
-      scale_x_continuous(breaks = c(min(var_x):max(var_x)))
-    
-  } else {
-    p <- p + geom_bar()
-  } 
-  
-})
-plot_grid(plotlist = my_plots)
-}
+# ----- Principal component analysis ------
+PCA(df.effective, scale.unit = TRUE, graph = TRUE)
