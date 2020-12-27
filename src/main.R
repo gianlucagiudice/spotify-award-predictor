@@ -120,7 +120,7 @@ ggpairs(df.sample, aes(colour = award, alpha = 0.2))
 ggsave("pairplot.png", plot = last_plot(), path = "images",
        scale = 1.75, dpi = floor(DPI), limitsize = TRUE)
 # Remove useless feature
-df.effective = subset(df, select = c(1:5, 7:11))
+df.effective = subset(df, select = c(1:5, 7:10))
 df.award = df$award
 corr <- cor(df.effective)
 ggcorrplot(corr)
@@ -129,4 +129,16 @@ ggsave("correlation.png", plot = last_plot(), path = "images",
 
 
 # ----- Principal component analysis ------
-PCA(df.effective, scale.unit = TRUE, graph = TRUE)
+res.pca = PCA(df.effective, scale.unit = TRUE, graph = TRUE)
+p <- fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 30)) + 
+    labs(title = "Variance explained")
+cum_var = data.frame(x=1:length(res.pca$eig[, 3]), y=res.pca$eig[, 3])
+p <- p + geom_point(data=res.pca$eig[, 3])
+ggsave("pca_variance_explained.png", plot = last_plot(), path = "images",
+      scale = 0.75, dpi = floor(DPI), limitsize = TRUE)
+# Color by cos2 values: quality on the factor map
+fviz_pca_var(res.pca, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE)
+ggsave("pca_dim.png", plot = last_plot(), path = "images",
+       scale = 0.75, dpi = floor(DPI), limitsize = TRUE)
