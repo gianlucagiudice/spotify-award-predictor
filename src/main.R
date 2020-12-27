@@ -30,7 +30,7 @@ data$mode <- factor(data$mode)
 data$key <- factor(data$key)
 data$explicit <- factor(data$explicit)
 data$mode <- factor(data$mode)
-data$award <- !data$award == "null"
+data$award <- factor(!data$award == "null")
 head(data)
 
 # Songs after 2000
@@ -38,13 +38,7 @@ data <- subset(data, year>2000)
 
 
 # ---------- Dataset Exploration ----------
-# Years
-ggplot(data, aes(year)) +
-  ggtitle("Years distribution") +
-  xlab("Year") + ylab("Num. of songs") + 
-  geom_histogram(color="black", fill="white", binwidth = 1) +
-  scale_x_continuous(breaks = c(min(data$year):max(data$year))) +
-  theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
+# Years©just = 0.5))
 ggsave("years_distribution.png", plot = last_plot(), path = "images",
        scale = 1, dpi = DPI, limitsize = TRUE)
 
@@ -106,39 +100,97 @@ data_balanced = union(positive, negative_sample)
 
 
 # --------- Feature Visualization ----------
-# Keep only numeric features 
-df = subset(data_balanced, select=c(3, 5:8, 10, 12, 13, 15:18))
+# Keep only numeric features
+df = data_balanced
+df.numeric = subset(df, select=c(3, 5:8, 10, 12, 13, 15:17))
+df.award = df$award
+df.categorical = subset(df, select=c(9, 11, 14))
 # Standardize
-X = as.data.frame(scale(df[1:ncol(df)-1], center = TRUE, scale = TRUE))
-y = df$award
-df = X
-df$award = y
-head(df)
+df.numeric = as.data.frame(scale(df.numeric, center = TRUE, scale = TRUE))
+head(df.numeric)
 # Sample 500 random points for plot purpose
-df.sample <- sample_n(df, 500, seed=seed)
+df.sample <- sample_n(df.numeric, 500, seed=seed)
+df.sample$award <- df[as.integer(rownames(df.sample)),]$award
+# Pair plot
 ggpairs(df.sample, aes(colour = award, alpha = 0.2))
 ggsave("pairplot.png", plot = last_plot(), path = "images",
        scale = 1.75, dpi = floor(DPI), limitsize = TRUE)
-# Remove useless feature
-df.effective = subset(df, select = c(1:5, 7:10))
-df.award = df$award
-corr <- cor(df.effective)
+# Remove useless feature (duration_ms)
+df.active = subset(df.numeric, select = c(1:3, 5:10))
+corr <- cor(df.active)
 ggcorrplot(corr)
 ggsave("correlation.png", plot = last_plot(), path = "images",
        scale = 1, dpi = floor(DPI), limitsize = TRUE)
 
 
 # ----- Principal component analysis ------
-res.pca = PCA(df.effective, scale.unit = TRUE, graph = TRUE)
-p <- fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 30)) + 
-    labs(title = "Variance explained")
-cum_var = data.frame(x=1:length(res.pca$eig[, 3]), y=res.pca$eig[, 3])
-p <- p + geom_point(data=res.pca$eig[, 3])
+pca = PCA(df.active, scale.unit = TRUE, ncp = 6)
+p <- fviz_eig(pca, addlabels = TRUE, ylim = c(0, 100)) + 
+    labs(title = "Variance explained + cumulative variance")
+# Cumulative variance
+cum_var = data.frame(x=1:length(pca$eig[, 3]), y=pca$eig[, 3])
+print("Cumulative variance:")
+print(cum_var)
+p <- p +
+  geom_point(data=cum_var, aes(x, y)) + 
+  geom_line(data=cum_var, aes(x, y), color="red"); p
 ggsave("pca_variance_explained.png", plot = last_plot(), path = "images",
-      scale = 0.75, dpi = floor(DPI), limitsize = TRUE)
+      scale = 1, dpi = floor(DPI), limitsize = TRUE)
 # Color by cos2 values: quality on the factor map
-fviz_pca_var(res.pca, col.var = "cos2",
+fviz_pca_var(pca, col.var = "cos2",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
              repel = TRUE)
-ggsave("pca_dim.png", plot = last_plot(), path = "images",
-       scale = 0.75, dpi = floor(DPI), limitsize = TRUE)
+ggsave("pca_dimensions_repr.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = floor(DPI), limitsize = TRUE)
+# Feature contribution
+fviz_contrib(pca, choice="var", axes = 1:6)
+ggsave("pca_feature_contribution.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = floor(DPI), limitsize = TRUE)
+# Projected data points over the 6 principal components
+df.pc6 = pca$ind$coord
+print(head(df.pc6))
+
+
+# -------- Categorical features ---------
+# Explicit feature
+ggplot(data=df, aes(explicit, fill=factor(award))) +
+  ggtitle("Explicit distribution") +
+  geom_bar(colour="black", position="dodge") +
+  theme(plot.title = element_text(hjust = 0.5))
+ggsave("explicit_distribution.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = floor(DPI), limitsize = TRUE)
+
+# Mode feature
+ggplot(data=df, aes(mode, fill=factor(award))) +
+  ggtitle("Mode distribution") +
+  geom_bar(colour="black", position="dodge") +
+  theme(plot.title = element_text(hjust = 0.5))
+ggsave("mode_distribution.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = floor(DPI), limitsize = TRUE)
+
+# Key feature
+ggplot(data=df, aes(key, fill=factor(award))) +
+  ggtitle("Key distribution") +
+  geom_bar(colour="black", position="dodge") +
+  theme(plot.title = element_text(hjust = 0.5))
+ggsave("key_distribution.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = floor(DPI), limitsize = TRUE)
+
+
+# ------ Dataframe for training -------
+# Categorical features
+df.out = df.categorical
+df.out$explicit = as.integer(df.categorical$explicit) - 1
+df.out$mode = as.integer(df.categorical$mode) - 1
+df.out$key = rescale01(as.integer(df.categorical$key) - 1)
+# Principal components
+df.out$pc1 = df.pc6[,1]
+df.out$pc2 = df.pc6[,2]
+df.out$pc3 = df.pc6[,3]
+df.out$pc4 = df.pc6[,4]
+df.out$pc5 = df.pc6[,5]
+df.out$pc6 = df.pc6[,6]
+# Timestamp in ms
+df.out$duration_ms = df.numeric$duration_ms
+# Out dataframe
+print(head(df.out))

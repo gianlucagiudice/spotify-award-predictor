@@ -41,6 +41,9 @@ Il dataset integrato è il file "data/songs.csv"
 - Dal pairplot possiamo osservare anche la distribuzione dei valori delle features
     - Emerge che alcune features sono inutili: instrumentalness
 - Far notare che chiaramente non useremo la feature popularity per il training del modellos
+- Far notare che facendo training DOPO aver proiettato gli individui sulle componeneti principali, per previsioni di futuri individui sarà necessario proiettare gli individui nel nuovo spazio usando i primi k autovettori ordinati in ordine decrescente in base ai relativi autovalori associati, dove gli autovalori e autovettori sono il risultato della singular value decomposition della matrice di covarianza.
+- Variabile categorica key viene trasformata in intero e non viene utilizzata una rappresentazione hot-encoding in quanto per le chiavi ddi un'ottava è possibile consideraree una relalzione d'ordine totale (e.g. sol < la < si < ...) 
+
 
 ## Domande
 - Può essere un buon metodo fare un samplimng per motivi di data visualization avendo un numero di osservazioni molto ampio?
