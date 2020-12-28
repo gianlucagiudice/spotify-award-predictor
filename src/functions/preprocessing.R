@@ -131,8 +131,8 @@ build_dataframe <- function(balanced) {
 }
 
 # Principal component analysis
-perform_pca <- function(active) {
-    pca = PCA(active, scale.unit = TRUE, ncp = 6)
+perform_pca <- function(active, ncp) {
+    pca = PCA(active, scale.unit = TRUE, ncp = ncp)
     p <- fviz_eig(pca, addlabels = TRUE, ylim = c(0, 100)) + 
         labs(title = "Variance explained + cumulative variance")
     # Cumulative variance
@@ -151,7 +151,7 @@ perform_pca <- function(active) {
     ggsave("pca_dimensions_repr.png", plot = last_plot(), path = "images",
         scale = 1, dpi = floor(DPI), limitsize = TRUE)
     # Feature contribution
-    fviz_contrib(pca, choice="var", axes = 1:6)
+    fviz_contrib(pca, choice="var", axes = 1:ncp)
     ggsave("pca_feature_contribution.png", plot = last_plot(), path = "images",
         scale = 1, dpi = floor(DPI), limitsize = TRUE)
     # Projected data points over the 6 principal components

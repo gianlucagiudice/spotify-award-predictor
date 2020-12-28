@@ -6,11 +6,11 @@ source('src/functions/training_decisiontree.R')
 
 # ------------- Constants --------------
 DPI <- 300
-TERM_FREQUENCY_THLD <- 3
+TERM_FREQUENCY_THLD <- 10
 YEAR_THLD <- 2005
 POPULARITY_THLD <- 25
 SEED = 830694 + 829664
-
+NCP <- 6
 
 # ------------ Preprocessing ------------
 # Read the dataset 
@@ -38,7 +38,7 @@ df.active = df[[7]]
 df = df[[1]]
 
 # Principal components analysis
-df.pc6 = perform_pca(df.active)
+df.pc6 = perform_pca(df.active, NCP)
 print(head(df.pc6))
 
 # Plot categorical feature
@@ -57,7 +57,16 @@ print(paste("Dimension of the dataset for training (rows x columns):",
 
 # ------------ Training SVM ------------
 # TODO
+library(e1071)
 
+ind = sample(2, nrow(df.out), replace = TRUE, prob=c(0.7, 0.3))
+testset = df.out[ind == 2,]
+trainset = df.out[ind == 1,]
+
+svm.model = svm(award ~ ., data=trainset, kernel='linear', scale = TRUE)
+predicted.classes <- svm.model %>% predict(testset)
+print(mean(predicted.classes == testset$award))
 
 # ------- Training Decision tree -------
 # TODO
+
