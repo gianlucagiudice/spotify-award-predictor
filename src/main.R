@@ -1,8 +1,8 @@
 # ------- Load custom functions -------
+# IMPORTANTE IMPOSTARE A TRUE L'INSTALLAZIONE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
 source('src/functions/training_decisiontree.R')
-
 
 # ------------- Constants --------------
 DPI <- 300

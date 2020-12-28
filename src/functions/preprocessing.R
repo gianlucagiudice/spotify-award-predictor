@@ -3,7 +3,7 @@ libraries = c("plyr", "ggplot2", "readr", "caret", "dplyr", "GGally", "tidyverse
               "ggcorrplot", "FactoMineR", "factoextra", "tm", "ggwordcloud",
               "wordcloud2", "webshot", "htmlwidgets", "dplyr", "data.table")
 if (FALSE){
-  install.packages(libraries)
+  install.packages(libraries, character.only = TRUE)
 }
 for (library in libraries){
   library(library, character.only = TRUE)
