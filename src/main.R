@@ -1,13 +1,15 @@
 # ---------- Libraries ----------
 libraries = c("plyr", "ggplot2", "readr", "caret", "dplyr", "GGally",
-              "ggcorrplot", "FactoMineR", "factoextra")
-#install.packages(c("FactoMineR", "factoextra"))
+              "ggcorrplot", "FactoMineR", "factoextra", "tm",
+              "tidyverse", "ggwordcloud", "wordcloud2", "webshot",
+              "htmlwidgets")
 if (FALSE){
   install.packages(libraries)
 }
 for (library in libraries){
   library(library, character.only = TRUE)
 }
+webshot::install_phantomjs()
 
 DPI = 300
 
@@ -38,7 +40,6 @@ data <- subset(data, year>2000)
 
 
 # ---------- Dataset Exploration ----------
-# Years©just = 0.5))
 ggsave("years_distribution.png", plot = last_plot(), path = "images",
        scale = 1, dpi = DPI, limitsize = TRUE)
 
@@ -175,6 +176,55 @@ ggplot(data=df, aes(key, fill=factor(award))) +
   theme(plot.title = element_text(hjust = 0.5))
 ggsave("key_distribution.png", plot = last_plot(), path = "images",
        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+
+
+# --------- BOW for artists -----------
+artists.df = data.frame(artists = df$artists)
+artists.tf =
+  artists_df %>% 
+  rownames_to_column(var="row") %>% 
+  mutate(artists=str_split(artists, ",")) %>% 
+  unnest(cols = c(artists)) %>% 
+  mutate(dummy=1) %>% 
+  spread(artists, dummy, fill=0)
+artists.tf = subset(artists.tf, select = c(2:ncol(artists_tf)))
+artists.occurrence = data.frame(occurrence = colSums(artists_tf[-1]))
+# Artists frequency
+ggplot(artists.occurrence, aes(occurrence)) +
+  ggtitle("Frequency of occurrences of artists among songs") +
+  xlab("Occurrence in songs") + ylab("Frequency") + 
+  geom_histogram(color="black", fill="white", binwidth = 1) +
+  scale_x_continuous(breaks = c(0:100)) +
+  theme(axis.text.x = element_text(angle = 90),
+        plot.title = element_text(hjust = 0.5))
+ggsave("artists_occurence.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = DPI, limitsize = TRUE)
+print(c("Occurrence quantile:", quantile(artists.occurrence$occurrence)))
+# Threshold over occurrence
+artists.occurrence_thld = subset(artists.occurrence, artists.occurence$occurence > 2)
+ggplot(artists.occurrence_thld, aes(occurrence)) +
+  ggtitle("Frequency of occurrences of artists among songs (Occurrence >= 3)") +
+  xlab("Occurrence in songs") + ylab("Frequency") + 
+  geom_histogram(color="black", fill="white", binwidth = 1) +
+  scale_x_continuous(breaks = c(0:100)) +
+  theme(axis.text.x = element_text(angle = 90),
+        plot.title = element_text(hjust = 0.5))
+ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
+       scale = 1, dpi = DPI, limitsize = TRUE)
+print(c("Occurrence quantile:", quantile(artists.occurrence_thld$occurrence)))
+# Wordcloud
+if (FALSE){
+  wordcloud(words = rownames(artists.occurrence_thld),
+            freq = artists.occurrence_thld$occurrence, min.freq = 5,
+            random.order = FALSE, colors = brewer.pal(8,"Dark2"))
+}
+wordcloud_df = artists.occurrence_thld
+wordcloud_df$word = rownames(wordcloud_df)
+wordcloud_df$frew = wordcloud_df$occurrence
+wordcloud_df = subset(wordcloud_df, select = c(2,3))
+wordcloud_graph <- wordcloud2(wordcloud_df)
+saveWidget(wordcloud_graph, "/tmp/tmp.html", selfcontained = F)
+webshot("/tmp/tmp.html", "images/wordcloud.png", delay=5, vwidth = 2000, vheight=2000)
 
 
 # ------ Dataframe for training -------
