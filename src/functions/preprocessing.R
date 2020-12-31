@@ -254,7 +254,7 @@ build_out_dataframe <- function(df, tf, pc6, categorical, award){
     # Categorical features
     df.out$explicit = as.integer(categorical$explicit) - 1
     df.out$mode = as.integer(categorical$mode) - 1
-    df.out$key = rescale01(as.integer(categorical$key) - 1)
+    df.out$key = range01(as.integer(categorical$key) - 1)
     # Timestamp in milliseconds
     df.out$duration_ms = df$duration_ms
     # Label

@@ -1,16 +1,18 @@
 # ------- Load custom functions -------
-# IMPORTANTE IMPOSTARE A TRUE L'INSTALLAZIONE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
 source('src/functions/training_decisiontree.R')
 
+
 # ------------- Constants --------------
 DPI <- 300
-TERM_FREQUENCY_THLD <- 10
+TERM_FREQUENCY_THLD <- 0
 YEAR_THLD <- 2005
 POPULARITY_THLD <- 25
 SEED = 830694 + 829664
-NCP <- 6
+NCP <- 6 # Number of principal components
+N_FOLDS = 10
+
 
 # ------------ Preprocessing ------------
 # Read the dataset 
@@ -55,18 +57,33 @@ print(paste("Dimension of the dataset for training (rows x columns):",
             dim(df.out)[1], dim(df.out)[2]))
 
 
-# ------------ Training SVM ------------
+# ------------ Training ------------
+set.seed(SEED)
+folds = createFolds(df.out$award, k = N_FOLDS)
+# ==== SVM ====
+hyperparameter = find_best_parameters(df.out, "radial")
+# Train model
+training_report = train_svm(df.out, hyperparameter, folds)
+performance.positive_folds = training_report[[1]]
+performance.negative_folds = training_report[[2]]
+# Class performance
+performance.positive = combine_folds_performance(performance.positive_folds)
+performance.negative = combine_folds_performance(performance.negative_folds)
+plot_class_performance(performance.positive[5:7], performance.negative[5:7])
+# Confusion matrix
+confusion_matrix = combine_folds_cm(performance.positive_folds)
+plot_performance(confusion_matrix, performance.positive, performance.negative)
+plot_cm(confusion_matrix)
+# AUC
+opt_cut = plot_auc(df.out, 'radial', hyperparameter)
+print("Optimal cutoff:")
+print(opt_cut)
+
+
+#  ==== Decision Tree ====
 # TODO
-library(e1071)
 
-ind = sample(2, nrow(df.out), replace = TRUE, prob=c(0.7, 0.3))
-testset = df.out[ind == 2,]
-trainset = df.out[ind == 1,]
 
-svm.model = svm(award ~ ., data=trainset, kernel='linear', scale = TRUE)
-predicted.classes <- svm.model %>% predict(testset)
-print(mean(predicted.classes == testset$award))
-
-# ------- Training Decision tree -------
+# ------- Model comparison -------
 # TODO
 
