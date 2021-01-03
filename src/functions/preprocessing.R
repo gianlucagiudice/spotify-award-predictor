@@ -190,6 +190,7 @@ plot_categorical_feature <- function(df) {
 # Bag of words representation for artists
 build_term_frequency_matrix <- function(df) {
     artists.df = data.frame(artists = df$artists)
+    artists.df$award = df$award
     artists.tf =
         artists.df %>% 
         rownames_to_column(var="row") %>% 
@@ -198,6 +199,7 @@ build_term_frequency_matrix <- function(df) {
         mutate(dummy=1) %>% 
         spread(artists, dummy, fill=0)
     artists.tf = subset(artists.tf, select = c(2:ncol(artists.tf)))
+    
     artists.occurrence = data.frame(occurrence = colSums(artists.tf[-1]))
     # Artists frequency
     ggplot(artists.occurrence, aes(occurrence)) +
@@ -225,19 +227,49 @@ build_term_frequency_matrix <- function(df) {
     ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
         scale = 1, dpi = DPI, limitsize = TRUE)
     print(c("Occurrence quantile:", quantile(artists.occurrence_thld$occurrence)))
-    # Wordcloud
-    wordcloud_df = artists.occurrence_thld
-    wordcloud_df$word = rownames(wordcloud_df)
-    wordcloud_df$frew = wordcloud_df$occurrence
-    wordcloud_df = subset(wordcloud_df, select = c(2,3))
-    wordcloud_graph <- wordcloud2(wordcloud_df)
-    wordcloud_graph
-    saveWidget(wordcloud_graph, "/tmp/tmp.html", selfcontained = F)
-    webshot("/tmp/tmp.html", "images/wordcloud.png", delay=8, vwidth = 2000, vheight=2000)
-    # Bow for artists with threshold
-    artists.tf_thld = artists.tf[rownames(artists.occurrence_thld)]
+    
+    # Wordcloud overall
+    plot_wordcloud(artists.occurrence_thld, "images/wordcloud_overall.png")
+    
+    # Wordcloud award
+    artists.tf_positive = subset(artists.tf,
+                                 artists.tf$award == "TRUE")
+    artists.occurrence_positive = data.frame(
+      occurrence = colSums(artists.tf_positive[-1]))
+    
+    artists.occurrence_thld_positive =
+      subset(artists.occurrence_positive,
+             artists.occurrence_positive$occurrence >= TERM_FREQUENCY_THLD)
+    plot_wordcloud(artists.occurrence_thld_positive,
+                   "images/wordcloud_positive.png")
+    
+    # Wordcloud not award
+    artists.tf_negative = subset(artists.tf,
+                                 artists.tf$award == "FALSE")
+    artists.occurrence_negative = data.frame(
+      occurrence = colSums(artists.tf_negative[-1]))
+    
+    artists.occurrence_thld_negative =
+      subset(artists.occurrence_negative,
+             artists.occurrence_negative$occurrence >= TERM_FREQUENCY_THLD)
+    plot_wordcloud(artists.occurrence_thld_negative,
+                   "images/wordcloud_negative.png")
+    
+    
+    
+    return(artists.tf[rownames(artists.occurrence_thld)])
+}
 
-    return(artists.tf_thld)
+plot_wordcloud <- function(df, image_name){
+  wordcloud_df = df
+  wordcloud_df$word = rownames(wordcloud_df)
+  wordcloud_df$frew = wordcloud_df$occurrence
+  wordcloud_df = subset(wordcloud_df, select = c(2,3))
+  wordcloud_graph <- wordcloud2(wordcloud_df)
+  wordcloud_graph
+  saveWidget(wordcloud_graph, "/tmp/tmp.html", selfcontained = F)
+  webshot("/tmp/tmp.html", image_name, delay=8, vwidth = 2000, vheight=2000)
+    
 }
 
 # Build dataframe for training
