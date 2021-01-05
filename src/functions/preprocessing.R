@@ -40,7 +40,7 @@ data_visualization <- function(data, popularity_thld) {
         scale_x_continuous(breaks = c(min(data$year):max(data$year))) +
         theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
     ggsave("years_distribution.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     ggplot(data, aes(y=year)) + 
         ggtitle("Boxplot year") +
@@ -48,7 +48,7 @@ data_visualization <- function(data, popularity_thld) {
         scale_x_continuous(breaks = c(min(data$year):max(data$year))) +
         theme(plot.title = element_text(hjust = 0.5))
     ggsave("years_boxplot.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     # Popularity
     ggplot(data, aes(popularity)) +
@@ -58,7 +58,7 @@ data_visualization <- function(data, popularity_thld) {
         scale_x_continuous(breaks = c(0:100)) +
         theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
     ggsave("popularity_distribution.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     ggplot(data, aes(y=popularity)) + 
         ggtitle("Boxplot popularity") +
@@ -66,7 +66,7 @@ data_visualization <- function(data, popularity_thld) {
         scale_x_continuous(breaks = c(min(data$year):max(data$year))) +
         theme(plot.title = element_text(hjust = 0.5))
     ggsave("popularity_boxplot.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     # Minimum popularity
     # Assume we are interested in songs not completely unknown
@@ -79,7 +79,7 @@ data_visualization <- function(data, popularity_thld) {
         geom_boxplot() +
         theme(plot.title = element_text(hjust = 0.5))
     ggsave("year_award_comparison.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     # Award vs no award
     ggplot(data, aes(award)) +
@@ -88,7 +88,7 @@ data_visualization <- function(data, popularity_thld) {
         geom_bar(color="black", fill="white") +
         theme(plot.title = element_text(hjust = 0.5))
     ggsave("awards_distribution.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
 }
 
 # Build a balanced dataset
@@ -118,13 +118,13 @@ build_dataframe <- function(balanced) {
     pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.2))
     pairplot
     ggsave("pairplot.png", plot = pairplot, path = "images",
-        scale = 1.9, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE.9, dpi = floor(DPI), limitsize = TRUE)
     # Remove useless feature (duration_ms)
     df.active = subset(df.numeric, select = c(1:3, 5:10))
     corr <- cor(df.active)
     ggcorrplot(corr)
     ggsave("correlation.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 
     to_return = list(df, df.numeric, df.award, df.categorical, df.numeric, df.sample, df.active)
     return(to_return)
@@ -143,17 +143,17 @@ perform_pca <- function(active, ncp) {
     geom_point(data=cum_var, aes(x, y)) + 
     geom_line(data=cum_var, aes(x, y), color="red"); p
     ggsave("pca_variance_explained.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
     # Color by cos2 values: quality on the factor map
     fviz_pca_var(pca, col.var = "cos2",
                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
                 repel = TRUE)
     ggsave("pca_dimensions_repr.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
     # Feature contribution
     fviz_contrib(pca, choice="var", axes = 1:ncp)
     ggsave("pca_feature_contribution.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
     # Projected data points over the 6 principal components
     df.pc6 = pca$ind$coord
     
@@ -168,7 +168,7 @@ plot_categorical_feature <- function(df) {
     geom_bar(colour="black", position="dodge") +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("explicit_distribution.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 
     # Mode feature
     ggplot(data=df, aes(mode, fill=factor(award))) +
@@ -176,7 +176,7 @@ plot_categorical_feature <- function(df) {
     geom_bar(colour="black", position="dodge") +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("mode_distribution.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 
     # Key feature
     ggplot(data=df, aes(key, fill=factor(award))) +
@@ -184,7 +184,7 @@ plot_categorical_feature <- function(df) {
     geom_bar(colour="black", position="dodge") +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("key_distribution.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
 # Bag of words representation for artists
@@ -210,7 +210,7 @@ build_term_frequency_matrix <- function(df) {
         theme(axis.text.x = element_text(angle = 90),
                 plot.title = element_text(hjust = 0.5))
     ggsave("artists_occurence.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
     print(c("Occurrence quantile:", quantile(artists.occurrence$occurrence)))
     # Threshold over occurrence
     artists.occurrence_thld = subset(artists.occurrence,
@@ -225,7 +225,7 @@ build_term_frequency_matrix <- function(df) {
         theme(axis.text.x = element_text(angle = 90),
                 plot.title = element_text(hjust = 0.5))
     ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
-        scale = 1, dpi = DPI, limitsize = TRUE)
+        scale = SCALE, dpi = DPI, limitsize = TRUE)
     print(c("Occurrence quantile:", quantile(artists.occurrence_thld$occurrence)))
     
     # Wordcloud overall

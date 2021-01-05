@@ -6,6 +6,8 @@ source('src/functions/training_decisiontree.R')
 
 # ------------- Constants --------------
 DPI <- 300
+SCALE = 0.75
+
 TERM_FREQUENCY_THLD <- 1
 YEAR_THLD <- 2005
 POPULARITY_THLD <- 25

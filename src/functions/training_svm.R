@@ -107,7 +107,7 @@ plot_class_performance <- function(positive, negative){
     theme(plot.title = element_text(hjust = 0.5))
   
   ggsave("svm_class_performance.png", plot = last_plot(), path = "images",
-         scale = 1, dpi = floor(DPI), limitsize = TRUE)
+         scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
 
@@ -161,7 +161,7 @@ plot_performance <- function(cm, positive, negative){
     scale_y_continuous(breaks=seq(0, 1, 0.025)) +
     theme(plot.title = element_text(hjust = 0.5))
   ggsave("svm_performance.png", plot = last_plot(), path = "images",
-         scale = 1, dpi = floor(DPI), limitsize = TRUE)
+         scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
 
@@ -186,6 +186,9 @@ plot_cm <- function(cm){
 
 # AUC
 plot_auc <- function(df.out, kernel, hyperparameter){
+  # ========== MOLTO IMPORTANTE !!!! ==========
+  # TODO: Classe positiva e negativa
+  # ========== MOLTO IMPORTANTE !!!! ==========
   set.seed(SEED)
   ind = sample(2, nrow(df.out), replace = TRUE, prob=c(0.7, 0.3))
   trainset = df.out[ind == 1,]
