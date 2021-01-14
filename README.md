@@ -27,7 +27,7 @@ Il dataset integrato è il file "data/songs.csv"
         - Convertito in lowercase
     - Pulito il dataset anche per quanto riguarda i dati di spotify
         - Tolto le istanze uguali considerandolo come uguali se avevano stesso titolo e stessi autotri
-- Record linkage
+- **Data enrichment** -  Record linkage
     - Abbiamo caricato tutte le istanze in un database documentale (mongoDB)
         - Utile un documentale perchè per modellare una canzone del dataset di spotifuy artista abbiamo utilizzato una lista di artisti
     - Abbiamo sostitutio tutti i caratteri accentati degli artisti in carattere "plain" (Es. è -> e; ù -> u; ö -> o)
@@ -36,6 +36,9 @@ Il dataset integrato è il file "data/songs.csv"
 - Abbiamo fato il dump del tabase in formato csv
 
 ## Osservazioni
+- Threshold = 2 in quanto vogliamo escludere gli artisti che hanno fatto una sola canzone (Anche perchè abbiamo fatto undersampling) 
+- Feature extraction con PCA
+- La frequency degli artisti deve essere >= 0 perchè è importante quelli che non vincono
 - Dal pairplot risulta che esiste correlazione tra alcune variabili (es loudness:energy)
     - Questo è ancora più chiaro dalla matrice di covarianze
 - Dal pairplot possiamo osservare anche la distribuzione dei valori delle features
@@ -43,7 +46,10 @@ Il dataset integrato è il file "data/songs.csv"
 - Far notare che chiaramente non useremo la feature popularity per il training del modellos
 - Far notare che facendo training DOPO aver proiettato gli individui sulle componeneti principali, per previsioni di futuri individui sarà necessario proiettare gli individui nel nuovo spazio usando i primi k autovettori ordinati in ordine decrescente in base ai relativi autovalori associati, dove gli autovalori e autovettori sono il risultato della singular value decomposition della matrice di covarianza.
 - Variabile categorica key viene trasformata in intero e non viene utilizzata una rappresentazione hot-encoding in quanto per le chiavi ddi un'ottava è possibile consideraree una relalzione d'ordine totale (e.g. sol < la < si < ...) 
+- Model selection: 10-fold cross validtion per stimare gamma, c
 
 
 ## Domande
 - Può essere un buon metodo fare un samplimng per motivi di data visualization avendo un numero di osservazioni molto ampio?
+- Dotplot metric ROC
+- Grid search
