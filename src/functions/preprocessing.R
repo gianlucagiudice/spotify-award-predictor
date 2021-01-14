@@ -1,8 +1,9 @@
 # --------- Libraries ---------
 libraries = c("plyr", "ggplot2", "readr", "caret", "dplyr", "GGally", "tidyverse",
               "ggcorrplot", "FactoMineR", "factoextra", "tm", "ggwordcloud",
-              "wordcloud2", "webshot", "htmlwidgets", "dplyr", "data.table")
-if (FALSE){
+              "wordcloud2", "webshot", "htmlwidgets", "dplyr", "data.table",
+              "slam")
+if (INSTALL_LIBRARIES){
   install.packages(libraries, character.only = TRUE)
 }
 for (library in libraries){
@@ -118,7 +119,7 @@ build_dataframe <- function(balanced) {
     pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.2))
     pairplot
     ggsave("pairplot.png", plot = pairplot, path = "images",
-        scale = SCALE.9, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
     # Remove useless feature (duration_ms)
     df.active = subset(df.numeric, select = c(1:3, 5:10))
     corr <- cor(df.active)

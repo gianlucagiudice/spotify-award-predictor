@@ -2,31 +2,39 @@
 library(parallel)
 library(caret)
 
-numCores <- detectCores()
+libraries = c("e1071", "caret", "ROCR", "C50", "pROC", "parallel",
+              "libcoin", "kernlab")
 
-
-libraries = c("e1071", "caret", "ROCR", "C50", "pROC", "parallel")
-
-if (FALSE){
-  install.packages(libraries, character.only = TRUE)
+if (INSTALL_LIBRARIES){
+  install.packages(libraries, dependencies = TRUE, character.only = TRUE)
 }
 for (library in libraries){
   library(library, character.only = TRUE)
 }
 
+
+# ------------- Constants --------------
+NUM_CORES <- detectCores()
+COST_LIST = 10^(-3:1)
+GAMMA_LIST = 10^(-5:-1)
+
+
+DPI <- 300
+SCALE = 0.75
+
+
 # --------- Functions ---------
 # Find best cost parameter using 10-folds cross validation
 find_best_parameters <- function(df, kernel) {
-  cost_list = 10^(-3:1)
-  gamma_list = 10^(-5:-1)
-  
-  tuned = tune.svm(award~., data=df.out, kernel=kernel,
-                         cost=cost_list, gamma = gamma_list)
+  tuned = tune.svm(award~., data=df.out,
+                   kernel=kernel,
+                   tune.control(cross = 5),
+                   cost=COST_LIST, gamma = GAMMA_LIST)
   return(tuned)
 }
 
 # Train support vector machine classifier using cross validation
-train_svm <- function(df, hyperparameter, folds){
+train_svm_cv <- function(df, folds){
   performance.positive = c()
   performance.negative = c()
   
@@ -40,12 +48,14 @@ train_svm <- function(df, hyperparameter, folds){
       }
     }
     
-    svm.trained_cv = train(award ~ ., data = df[train_idx,], method = "svmRadial",
+    print(paste("Training SVM - fold ", i, "/", length(folds)))
+    svm.trained_cv = train(award ~ ., data = df[train_idx,],
+                           method = "svmRadial",
                            tuneGrid=expand.grid(
-                             C=hyperparameter$best.parameters$c,
-                             sigma=hyperparameter$best.parameters$gamma
+                             C=COST_LIST,
+                             sigma=GAMMA_LIST
                            ),
-                           num.threads = numCores)
+                           num.threads = NUM_CORES * 2)
     # Evaluate fold performance
     fold.positive_performance = list(evaluate_performance(
       svm.trained_cv, df[test_idx, ], "TRUE"))
@@ -57,20 +67,6 @@ train_svm <- function(df, hyperparameter, folds){
   }
   
   return(list(performance.positive, performance.negative))
-}
-
-
-# Train support vector machine classifier using cross validation
-train_svm_cv <- function(df.out, hyperparameter){
-  svm.model = train(award ~ ., data = df.out, method = "svmRadial",
-                    tuneGrid=expand.grid(
-                      C=hyperparameter$best.parameters$c,
-                      sigma=hyperparameter$best.parameters$gamma
-                    ),
-                    metric = "accuracy",
-                    num.threads = numCores,
-                    trControl = control, verbose = TRUE)
-  return(svm.model)
 }
 
 
@@ -185,18 +181,24 @@ plot_cm <- function(cm){
 
 
 # AUC
-plot_auc <- function(df.out, kernel, hyperparameter){
+plot_auc <- function(df.out, kernel){
   # ========== MOLTO IMPORTANTE !!!! ==========
   # TODO: Classe positiva e negativa
   # ========== MOLTO IMPORTANTE !!!! ==========
   set.seed(SEED)
+  
+  #ind_sub = sample(2, nrow(df.out), replace = TRUE, prob=c(0.1, 0.9))
+  #df.out = df.out[ind_sub == 1]
+  
   ind = sample(2, nrow(df.out), replace = TRUE, prob=c(0.7, 0.3))
   trainset = df.out[ind == 1,]
   testset = df.out[ind == 2,] 
   # Performance
+  hyperparameter = find_best_parameters(testset, kernel)
   svmfit=svm(award~ ., data=trainset, prob=TRUE, kernel = kernel,
              gamma=hyperparameter$best.parameters$gamma,
              cost = hyperparameter$best.parameters$c)
+  # Probabilmente bisogna cambiare parametro probability = TRUE
   pred=predict(svmfit,
                testset[, !names(testset) %in% c("award")], probability=TRUE) 
   pred.prob = attr(pred, "probabilities")

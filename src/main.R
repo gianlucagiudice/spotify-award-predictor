@@ -1,4 +1,7 @@
 # ------- Load custom functions -------
+INSTALL_LIBRARIES = FALSE
+DUMP_MODEL = FALSE
+TRAIN_MODEL = FALSE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
 source('src/functions/training_decisiontree.R')
@@ -8,11 +11,11 @@ source('src/functions/training_decisiontree.R')
 DPI <- 300
 SCALE = 0.75
 
-TERM_FREQUENCY_THLD <- 1
+TERM_FREQUENCY_THLD <- 2 # Term frequency
 YEAR_THLD <- 2005
 POPULARITY_THLD <- 25
 SEED = 830694 + 829664
-NCP <- 6 # Number of principal components
+NPC <- 6 # Number of principal components
 N_FOLDS = 10
 
 
@@ -42,7 +45,7 @@ df.active = df[[7]]
 df = df[[1]]
 
 # Principal components analysis
-df.pc6 = perform_pca(df.active, NCP)
+df.pc6 = perform_pca(df.active, NPC)
 print(head(df.pc6))
 
 # Plot categorical feature
@@ -62,10 +65,18 @@ print(paste("Dimension of the dataset for training (rows x columns):",
 # ------------ Training ------------
 set.seed(SEED)
 folds = createFolds(df.out$award, k = N_FOLDS)
+
 # ==== SVM ====
-hyperparameter = find_best_parameters(df.out, "radial")
 # Train model
-training_report = train_svm(df.out, hyperparameter, folds)
+if (TRAIN_MODEL){
+  training_report = train_svm_cv(df.out, folds)
+  if (DUMP_MODEL){
+    # Save report
+    save(training_report, file="svmReport.RData")
+  }
+}else{
+  load("svmReport.RData")
+}
 performance.positive_folds = training_report[[1]]
 performance.negative_folds = training_report[[2]]
 # Class performance
@@ -77,7 +88,7 @@ confusion_matrix = combine_folds_cm(performance.positive_folds)
 plot_performance(confusion_matrix, performance.positive, performance.negative)
 plot_cm(confusion_matrix)
 # AUC
-opt_cut = plot_auc(df.out, 'radial', hyperparameter)
+opt_cut = plot_auc(df.out, 'radial')
 print("Optimal cutoff:")
 print(opt_cut)
 
@@ -89,3 +100,40 @@ print(opt_cut)
 # ------- Model comparison -------
 # TODO
 
+
+if(FALSE){
+  kernel = "radial"
+  # ========== MOLTO IMPORTANTE !!!! ==========
+  # TODO: Classe positiva e negativa
+  # ========== MOLTO IMPORTANTE !!!! ==========
+  set.seed(SEED)
+  ind = sample(2, nrow(df.out), replace = TRUE, prob=c(0.7, 0.3))
+  trainset = df.out[ind == 1,]
+  testset = df.out[ind == 2,] 
+  # Performance
+  hyperparameter = find_best_parameters(testset, kernel)
+  svmfit=svm(award~ ., data=trainset, prob=TRUE, kernel = kernel,
+             gamma=hyperparameter$best.parameters$gamma,
+             cost = hyperparameter$best.parameters$c)
+  # Probabilmente bisogna cambiare parametro probability = TRUE
+  pred=predict(svmfit,
+               testset[, !names(testset) %in% c("award")], probability=TRUE) 
+  pred.prob = attr(pred, "probabilities")
+  # FORSE CAMBIARE QUESto
+  pred.to.roc = pred.prob[, 1]
+  #Plot
+  pred.rocr = prediction(pred.to.roc, testset$award)
+  perf.rocr = performance(pred.rocr, measure = "auc", x.measure = "cutoff") 
+  perf.tpr.rocr = performance(pred.rocr, "tpr","fpr") 
+  opt_cut = opt.cut(perf.tpr.rocr, pred.rocr)
+  # ROC curve
+  png('images/svm_auc.png')
+  plot(perf.tpr.rocr, colorize=T,main=paste("AUC:",(perf.rocr@y.values)))
+  abline(a=0, b=1)
+  dev.off()
+  # Best cutoff
+  acc.perf = performance(pred.rocr, measure = "acc")
+  png('images/svm_cutoff_acc.png')
+  plot(acc.perf, main = "Accurancy to changes in cutoff")
+  dev.off()
+}
