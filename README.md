@@ -38,6 +38,11 @@ Il dataset integrato è il file "data/songs.csv"
 ## Osservazioni
 - Threshold = 2 in quanto vogliamo escludere gli artisti che hanno fatto una sola canzone (Anche perchè abbiamo fatto undersampling) 
 - Feature extraction con PCA
+
+- Migliorare la PCA
+  - Seguire laboratorio fersini
+  - Non visualizziamo in 2 dimensioni in quanto la varianza spiegata è pochissima e quindi inutile
+
 - La frequency degli artisti deve essere >= 0 perchè è importante quelli che non vincono
 - Dal pairplot risulta che esiste correlazione tra alcune variabili (es loudness:energy)
     - Questo è ancora più chiaro dalla matrice di covarianze
