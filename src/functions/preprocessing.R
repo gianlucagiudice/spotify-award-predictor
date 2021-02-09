@@ -28,8 +28,21 @@ read_dataset <- function(path) {
     data$explicit <- factor(data$explicit)
     data$mode <- factor(data$mode)
     data$award <- factor(!data$award == "null")
+    # Convert to lowercase
+    data$name = to_lower(data$name)
+    data$artists = to_lower(data$artists)
     
     return(data)
+}
+
+to_lower <- function(input_list){
+  i = 1
+  result = rep(NA, length(input_list))
+  lower = lapply(input_list, tolower)
+  for (i in 1:length(input_list)){
+    result[i] = lower[[i]]
+  }
+  return(result)
 }
 
 # Data exploartion
