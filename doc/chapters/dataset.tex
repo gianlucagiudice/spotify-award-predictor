@@ -1,0 +1,69 @@
+\chapter{Dataset}
+
+\section{Acquisizione del dataset}
+\subsection{Dataset spotify - Kaggle}
+\subsection{Premi canzoni - Wikipedia}
+\subsubsection{Scraping}
+
+
+\section{Descrizione del dataset}
+
+\section{Normalizzazione}
+OpenRefine con regex per le date
+
+\section{Data integration}
+\subsection{Modellazione struttura documentale}
+\subsection{Record linkage con MongoDB}
+Una roba veloce giusto per spiegare
+
+\begin{enumerate}
+	\item Import dati mongodb
+	\item Creazione indici
+	\item Preprocessing lowercase
+	\item Unfold campo artista
+	\item Record linkage -> Join basandosi su titolo e artisti
+	\item Lista artisti come stringa
+	\item Dump del database in un file .csv come risultato del dataset per i modelli
+\end{enumerate}
+
+
+
+\section{Analisi esplorativa}
+
+\subsection{Distribuzione dei valori}
+\subsubsection{Variabili continue}
+\subsubsection{Variabili categoriche}
+
+\subsection{Artisti nelle canzoni}
+\subsubsection{Frequenza artisti}
+\subsubsection{Wordcloud}
+
+
+\subsection{Correlazione features}
+
+\subsection{Principal component analysis}
+Prima di PCA normalizzazione del dataset
+
+NB: Non facciamo il plot delle prime due componenti principali in quanto varianza spiegata dalle prime due componenti molto bassa
+
+\subsection{Creazione dataset bilanciato}
+\subsubsection{Undersampling}
+
+
+\section{Scelta delle features}
+\subsection{Normalizzazione e standardizzazione}
+Conversione in lowecase
+Converto in variabili numeriche e factor + label corretta
+\subsection{Dataset proiettato componenti principali}
+\subsection{Variabili categoriche}
+\subsubsection{Key -> Trasformazione a intero}
+\subsection{Artisti in una canzone - BOW}
+\subsubsection{Threshold freqeunza}
+Viene usato un threshold a 2 per non avere delle canzoni con artisti completamente sconosciuti. Assumiamo quindi di fare previsioni su canzoni cantante da artisti un minimo conosciuti.
+
+Questa assunzione non è molto restrittiva, ci immaginiamo infatti che per vincere un premio una canzone deve essere cantata da artisti non completamente sconosciuti
+
+Inoltre a causa dell'undersampling è possibile avere diverse canzoni cantate da artisti "sconosciuti" e non avendo scelto una particolare strategia per l'undersampling adottiamo a questo punto l'utilizzo di un threshold
+
+\subsection{Popularity}
+Chiaramente questa feature viene scartata per non creare modelli biased (Non si conosce questa feature quando una canzone esce)

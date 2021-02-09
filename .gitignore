@@ -42,3 +42,12 @@ vignettes/*.pdf
 .idea
 .
 .DS_Store
+
+# Latex
+*.aux
+*.toc
+*.log
+main.synctex.gz
+*.Rproj
+*.fls
+*.fdb_latexmk

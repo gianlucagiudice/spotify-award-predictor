@@ -43,7 +43,7 @@ Il dataset integrato è il file "data/songs.csv"
   - Seguire laboratorio fersini
   - Non visualizziamo in 2 dimensioni in quanto la varianza spiegata è pochissima e quindi inutile
 
-- La frequency degli artisti deve essere >= 0 perchè è importante quelli che non vincono
+- La frequency degli artisti deve essere >= 2 perchè è importante quelli che non vincono
 - Dal pairplot risulta che esiste correlazione tra alcune variabili (es loudness:energy)
     - Questo è ancora più chiaro dalla matrice di covarianze
 - Dal pairplot possiamo osservare anche la distribuzione dei valori delle features
