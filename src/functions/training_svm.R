@@ -55,7 +55,7 @@ train_svm_cv <- function(df, folds){
                              C=COST_LIST,
                              sigma=GAMMA_LIST
                            ),
-                           num.threads = NUM_CORES * 2)
+                           num.threads = NUM_CORES)
     # Evaluate fold performance
     fold.positive_performance = list(evaluate_performance(
       svm.trained_cv, df[test_idx, ], "TRUE"))
