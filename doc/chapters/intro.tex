@@ -1,16 +1,58 @@
 \chapter{Introduzione}
 
-Introduzione
+In questo capitolo viene introdotto il problema, il dominio di riferimento e l'approccio adottato per la risoluzione.
 
 \section{Descrizione del problema}
-Vogliamo sapere se una canzone sarà di successo
+In questo elaborato consideriamo i singoli musicali. Al giorno d'oggi le canzoni vengono spesso ascltate dagli utenti tramite piattaforme di streming musicale.
+
+L'obbiettivo del lavoro è quello di analizzare le features dei singoli musicali così da prevedere se una canzone diventerà o meno di successo. Nella sezione successiva verrà meglio specificato cosa si intende per \textbf{singolo musicale di successo} (\autoref{sec:successo}).
 
 \subsection{Spotify}
+Spotify è un servizio di riproduzione digitale in streaming di musica, podcast e video, con accesso immediato a milioni di brani e altri contenuti di artisti provenienti da tutto il mondo. Questa piattaforma viene utilizzata da milioni di utente per ascoltare canzoni e nello specifico singoli musicali.
+
+Da questo servizio è possibile ottenere migliaia di brani musicali, infatti Spotify mette a disposizione una API da cui è possibile scaricare informazioni su questi brani con assocciate alcune caratteristiche. Pertanto oltre alle classiche informazioni di un brano come "titolo" o "artisti" si avrà a disposizione una serie di caratteristiche specifiche del brano, ad esempio quanto una canzone è "energica" o "ballabile".
+
 
 \subsection{Premi per i singoli musicali}
-Metrica oggettiva per il successo di una canzone
+\label{sec:successo}
+
+Come vedremo in \autoref{sec:descrizione_spotify} il dataset ottenuto da Spotify mette a disposizione un campo "popularity" che indica quanto può essere considerata popolare. Tuttavia questa caratteristica non ci sembra adeguata per identificare una canzone come di successo oppure no.
+
+Per questo motivo consideriamo una canzone di successo in base alle certificazioni ottenute, rispettivamente "disco d'oro" o "disco di platino". Queste premi sono dei riconoscimenti vinti da un brano musicale e storicamente fanno riferimento al numero di copie vendute da un singolo. Tuttavia con la costante crescita dell'utilizzo di servizi per lo streming di brani musciali, da qualche anno questi riconoscimenti vengono assegnati anche considerando il numero di streaming sulle diverse piattaforme, tra cui Spotify.
+
+Riteniamo che questo riconosciemnto sia una metrica oggettiva per considerare un singolo come di successo.
+
+\section{Approccio al problema}
+Il problema viene approcciato come un \textbf{task di classificazione binaria}. Dato un singolo vogliamo prevedere se questo sarà di successo o no. Pertanto sviluppiamo modelli supervisionati di machine learning per classificare i singoli.
 
 
-\subsection{Approccio al problema}
+\section{Struttura del codice}
+Di seguito viene brevemente spiegata la struttura del codice, inoltre viene sotto indicata la working directory e l'entry point del programma.
+\dirtree{%
+	.1 root.
+	.2 data.
+	.3 raw \\ {\textit{Dataset da integrare}}.
+	.3 'songs.csv' \\{\textit{Dataset integrato da dare in input agli algoritmi}}.
+	.2 doc \\{\textit{Relazione progetto}}.
+	.2 images\\ {\textit{Immagini prodotte in output dagli script}}.
+	.2 scraper.
+	.3 'combine\_data.ipynb' \\{\textit{Notebook per combinare dataframe dei vari dischi d'oro delle nazioni}}.
+	.3 'wikipedia\_songs\_scraper.py' \\{\textit{Scraper per scaricare da wikipedia le informazioni riguardo le \\ certificazione dei singoli per le diverse nazioni}}.
+	.3 'import\_db.sh' \\{\textit{Import del dataset in mongoDB.}}.
+	.3 'record\_linkage.js' \\{\textit{Query in mongoDB per la fase di record linkage.}}.
+}
 
-\subsection{Struttura del codice}
+In particlare gli \textbf{script in R }si trovano in:
+
+\dirtree{%
+	.1 root.
+	.2 \textbf{src}.
+	.3 'main.R' \\{\textit{Entrypoint script in R}}.
+	.3 functions.
+	.4 'preprocessing.R' \\{\textit{Funzioni per il preprocessing e visualizzazione del dataset}}.
+	.4 'training\_svm.R' \\{\textit{Training modelli support vector machine}}.
+	.4 'training\_decisiontree.R' \\{\textit{Training modelli decision tree}}.
+}
+
+\textbf{N.B.}: Per come è stato progettato il codice, la working directory è la \verb|root/| e non la cartella \verb|src/|.
+L'\textbf{entry point del programma} è lo script \verb|src/main.R|
