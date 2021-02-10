@@ -51,3 +51,4 @@ main.synctex.gz
 *.Rproj
 *.fls
 *.fdb_latexmk
+*main.out
