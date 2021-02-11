@@ -46,14 +46,28 @@ to_lower <- function(input_list){
 }
 
 # Data exploartion
-data_visualization <- function(data, popularity_thld) {
+data_visualization <- function(data_all, popularity_thld, year_yhld) {
+    data = subset(data_all, year >= year_yhld)
+    
+    # Year distribution
+    ggplot(data_all, aes(year)) +
+      ggtitle("Years distribution") +
+      xlab("Year") + ylab("Num. of songs") + 
+      geom_histogram(color="black", fill="white", binwidth = 1) +
+      scale_x_continuous(
+        breaks = seq(min(data_all$year), max(data_all$year), by = 3)) +
+      theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
+    ggsave("years_distribution.png", plot = last_plot(), path = "images",
+           scale = SCALE, dpi = DPI, limitsize = TRUE)
+    
+    # Year distribution - thld
     ggplot(data, aes(year)) +
         ggtitle("Years distribution") +
         xlab("Year") + ylab("Num. of songs") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
         scale_x_continuous(breaks = c(min(data$year):max(data$year))) +
         theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
-    ggsave("years_distribution.png", plot = last_plot(), path = "images",
+    ggsave("years_distribution_thld.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     ggplot(data, aes(y=year)) + 
@@ -69,18 +83,22 @@ data_visualization <- function(data, popularity_thld) {
         ggtitle("Popularity distribution") +
         xlab("Popularity") + ylab("Num. of songs") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
-        scale_x_continuous(breaks = c(0:100)) +
+        scale_x_continuous(breaks = seq(0, 100, by = 2)) +
         theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
     ggsave("popularity_distribution.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     ggplot(data, aes(y=popularity)) + 
         ggtitle("Boxplot popularity") +
+        ylab("Popularity") +
         geom_boxplot() +
-        scale_x_continuous(breaks = c(min(data$year):max(data$year))) +
-        theme(plot.title = element_text(hjust = 0.5))
+        #coord_flip() +
+        scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+        theme(plot.title = element_text(hjust = 0.5),
+              axis.text.x = element_blank(), axis.ticks.x = element_blank())
     ggsave("popularity_boxplot.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = DPI, limitsize = TRUE)
+           height=17, width=7, units="cm",
+           scale = SCALE * 1.5, dpi = DPI, limitsize = TRUE)
 
     # Minimum popularity
     # Assume we are interested in songs not completely unknown
@@ -132,7 +150,9 @@ build_dataframe <- function(balanced) {
     pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.2))
     pairplot
     ggsave("pairplot.png", plot = pairplot, path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE * 1.5, dpi = DPI, 
+        height=25, width=40, units="cm",
+        limitsize = FALSE)
     # Remove useless feature (duration_ms)
     df.active = subset(df.numeric, select = c(1:3, 5:10))
     corr <- cor(df.active)
