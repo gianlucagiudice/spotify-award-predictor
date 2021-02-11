@@ -144,23 +144,26 @@ build_dataframe <- function(balanced) {
     # Standardize
     df.numeric = as.data.frame(scale(df.numeric, center = TRUE, scale = TRUE))
     # Sample 500 random points for plot purpose
-    df.sample <- sample_n(df.numeric, 500, seed=seed)
-    df.sample$award <- df[as.integer(rownames(df.sample)),]$award
+    SAMPLE_SIZE = 500
+    df.sample = df.numeric
+    df.sample$award = df.award
+    df.sample <- union_all(
+      sample_n(subset(df.sample, award == TRUE), SAMPLE_SIZE / 2, seed=SEED),
+      sample_n(subset(df.sample, award == FALSE), SAMPLE_SIZE / 2, seed=SEED))
     # Pair plot
-    pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.2))
-    pairplot
+    pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.15))
+    #pairplot
     ggsave("pairplot.png", plot = pairplot, path = "images",
-        scale = SCALE * 1.5, dpi = DPI, 
-        height=25, width=40, units="cm",
-        limitsize = FALSE)
-    # Remove useless feature (duration_ms)
-    df.active = subset(df.numeric, select = c(1:3, 5:10))
-    corr <- cor(df.active)
+           scale = SCALE * 1.5, dpi = DPI, 
+           height=29, width=40, units="cm",
+           limitsize = FALSE)
+    # Correlation plot
+    corr <- cor(df.numeric)
     ggcorrplot(corr)
     ggsave("correlation.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
-
-    to_return = list(df, df.numeric, df.award, df.categorical, df.numeric, df.sample, df.active)
+           scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+    
+    to_return = list(df, df.numeric, df.categorical, df.award)
     return(to_return)
 }
 
@@ -307,7 +310,7 @@ plot_wordcloud <- function(df, image_name){
 }
 
 # Build dataframe for training
-build_out_dataframe <- function(df, tf, pc6, categorical, award){
+build_out_dataframe <- function(tf, pc6, categorical, award){
     # Term frequency
     df.out = tf
     # Principal components
@@ -321,8 +324,6 @@ build_out_dataframe <- function(df, tf, pc6, categorical, award){
     df.out$explicit = as.integer(categorical$explicit) - 1
     df.out$mode = as.integer(categorical$mode) - 1
     df.out$key = range01(as.integer(categorical$key) - 1)
-    # Timestamp in milliseconds
-    df.out$duration_ms = df$duration_ms
     # Label
     df.out$award = award
 
