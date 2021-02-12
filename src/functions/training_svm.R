@@ -79,35 +79,34 @@ evaluate_performance <- function(model, testset, class) {
   return(result)
 }
 
-
-# Plot model performance
+                                        # Plot model performance
 plot_class_performance <- function(positive, negative){
-  precision <- c(positive[1], negative[1])
-  recall <- c(positive[2], negative[2])
-  f1 <- c(positive[3], negative[3])
-  metric <- c("precision", "precision", "recall", "recall", "f1", "f1")
-  score <-c(positive[1], negative[1],
-            positive[2], negative[2],
-            positive[3], negative[3])
-  award <- c("TRUE", "FALSE","TRUE", "FALSE","TRUE", "FALSE")
-  data.plot = data.frame(metric, score, award)
-  
-  ggplot(data=data.plot,
-         aes(x = factor(metric, level = c('precision', 'recall', 'f1')),
-             y = score, fill=factor(award))) +
-    ggtitle("Perfomance - award vs not award") +
-    labs(fill="Award") +
-    xlab("Metric") + ylab("Score") + 
-    geom_col(colour="black", position="dodge") +
-    scale_y_continuous(breaks=seq(0, 1, 0.025)) +
-    theme(plot.title = element_text(hjust = 0.5))
-  
-  ggsave("svm_class_performance.png", plot = last_plot(), path = "images",
-         scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+    precision <- c(positive[1], negative[1])
+    recall <- c(positive[2], negative[2])
+    f1 <- c(positive[3], negative[3])
+    metric <- c("precision", "precision", "recall", "recall", "f1", "f1")
+    score <-c(positive[1], negative[1],
+              positive[2], negative[2],
+              positive[3], negative[3])
+    award <- c("TRUE", "FALSE","TRUE", "FALSE","TRUE", "FALSE")
+    data.plot = data.frame(metric, score, award)
+    
+    ggplot(data=data.plot,
+           aes(x = factor(metric, level = c('precision', 'recall', 'f1')),
+               y = score, fill=factor(award))) +
+        ggtitle("Perfomance - award vs not award") +
+        labs(fill="Award") +
+        xlab("Metric") + ylab("Score") + 
+        geom_col(colour="black", position="dodge") +
+        scale_y_continuous(breaks=seq(0, 1, 0.025)) +
+        theme(plot.title = element_text(hjust = 0.5))
+    
+    ggsave("svm_class_performance.png", plot = last_plot(), path = "images",
+           scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
 
-# Combine folds to extract by-class performance
+                                        # Combine folds to extract by-class performance
 combine_folds_performance <- function(performance_folds){
   folds = c()
   for (i in 1:length(performance_folds)){

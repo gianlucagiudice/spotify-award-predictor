@@ -4,7 +4,7 @@ DUMP_MODEL = FALSE
 TRAIN_MODEL = FALSE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
-source('src/functions/training_decisiontree.R')
+source('src/functions/decision_tree.R')
 
 
 # ------------- Constants --------------
