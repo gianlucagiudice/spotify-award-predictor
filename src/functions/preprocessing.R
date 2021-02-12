@@ -124,9 +124,13 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
         ggtitle("Awards distribution") +
         xlab("Award") + ylab("Num. of songs") + 
         geom_bar(color="black", fill="white") +
-        theme(plot.title = element_text(hjust = 0.5))
+        coord_flip() +
+        scale_y_continuous(breaks = seq(min(0), max(30000), by = 1000)) +
+        theme(plot.title = element_text(hjust = 0.5),
+              axis.text.x = element_text(angle = 90))
     ggsave("awards_distribution.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = DPI, limitsize = TRUE)
+           height=15, width=40, units="cm",
+           scale = SCALE, dpi = DPI, limitsize = TRUE)
 }
 
 # Build a balanced dataset
