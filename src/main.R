@@ -4,8 +4,8 @@ DUMP_MODEL = FALSE
 TRAIN_MODEL = FALSE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
+source('src/functions/common_functions.R')
 source('src/functions/decision_tree.R')
-
 
 # ------------- Constants --------------
 DPI <- 300
@@ -86,8 +86,19 @@ print(opt_cut)
 
 
 #  ==== Decision Tree ====
-# TODO
 
 
-# ------- Model comparison -------
-# TODO
+### In R in generale é meglio non avere spazi dentro al nome di una colonna, rpart senza prima normalizzare i nomi di colonna non funziona
+### TODO questa operazione si potrebbe fare durante il preprocessing dei dati, tanto é veloce e non cambia niente per svm (penso)
+colnames(df.out) <- make.names(colnames(df.out))
+
+decision_tree.training_report = cross_validation_generic(df.out,
+                                                         train_decision_tree,
+                                                         folds,
+                                                         "Decision Tree")
+
+### TODO tutte le analisi del caso
+
+
+### ------- Model comparison -------
+### TODO 
