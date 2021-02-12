@@ -301,17 +301,23 @@ Analizzando la distribuzione dei valori della popolarità viene scelto 25 come t
 \subsubsection{Variabili numeriche}
 Di seguito viene mostrata la distribuzione di tutte le covariate, distinguendo tra singoli che hanno vinto un premio (Classe positiva) e quelli che non hanno vinto un premio (Classe negativa).
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=19cm, angle=270]{../images/pairplot.png}
-	\caption{Pairplot delle covariate.}
-\end{figure}
-
-Dal pairplot possiamo notare come non esiste una netta distinzione nei dati tra brani di successo e brani non di successo. Questo sarà sicuramente un problema in fase di classificazione e potrebbe potrare a basse performance dei modelli. Riteniamo quindi che sia necessario considerare altre features per ben distinguere brani musiclai di successo da quelli non di successo.
+Dal pairplot della \autoref{fig:pairplot} possiamo notare come non esiste una netta distinzione nei dati tra brani di successo e brani non di successo. Questo sarà sicuramente un problema in fase di classificazione e potrebbe potrare a basse performance dei modelli. Riteniamo quindi che sia necessario considerare altre features per ben distinguere brani musiclai di successo da quelli non di successo.
 
 Il campo "popularity" ben distingue le due classi, tuttavia come già discusso in \autoref{sec:popularity}, questa covariata non verrà utilizzata per la creazione dei modelli.
 
 Inoltre esiste correlazione tra alcune covariate, come ad esempio tra "energy" e "loudness", questo rispecchia intuitivamente l'idea di come una canzone più energica è anche più rumorosa. La correlazione tra le variabili viene meglio analizzata in \autoref{sec:correlazione}.
+
+
+\begin{figure}[H]
+	
+	\hspace*{-1.5cm}   
+	\centering
+	\includegraphics[width=23cm, angle=270]{../images/pairplot.png}
+	\caption{Pairplot delle covariate.}
+	\label{fig:pairplot}
+\end{figure}
+
+
 
 \subsubsection{Variabili categoriche}
 Di seguito si esplorano le variabili categoriche del dataset, distinguendo tra classe positiva e negativa.
@@ -340,7 +346,18 @@ Di seguito si esplorano le variabili categoriche del dataset, distinguendo tra c
 \end{figure}
 
 \subsection{Artisti nelle canzoni}
+Un'altra caratteristica che si ritiene importante per riconoscere una canzone come di successo, è quali artisti sono presenti in una canzone.
 \subsubsection{Frequenza artisti}
+\label{sec:freq_artisti}
+Vine ora considareato il numero di occorrenze di ogni artista tra tutte le canzoni, si analizza quindi la frequenza delle occorrenze.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=13cm]{../images/artists_occurence.png}
+	\caption{Frequenza delle occorenze degli artisti nelle canzoni.}
+\end{figure}
+
+Come possiamo notare da questo grafico, la maggior parte degli artisti hanno fatto solo una canzone.
 \subsubsection{Wordcloud}
 
 

@@ -253,6 +253,7 @@ build_term_frequency_matrix <- function(df) {
         xlab("Occurrence in songs") + ylab("Frequency") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
         scale_x_continuous(breaks = c(0:100)) +
+        scale_y_continuous(breaks = seq(0, 1500, by = 50)) +
         theme(axis.text.x = element_text(angle = 90),
                 plot.title = element_text(hjust = 0.5))
     ggsave("artists_occurence.png", plot = last_plot(), path = "images",
@@ -269,6 +270,7 @@ build_term_frequency_matrix <- function(df) {
         xlab("Occurrence in songs") + ylab("Frequency") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
         scale_x_continuous(breaks = c(0:100)) +
+        scale_y_continuous(breaks = seq(0, 1500, by = 20)) +
         theme(axis.text.x = element_text(angle = 90),
                 plot.title = element_text(hjust = 0.5))
     ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
