@@ -61,11 +61,13 @@ folds = createFolds(df.out$award, k = N_FOLDS)
 # ==== SVM ====
 # Train model
 if (TRAIN_MODEL){
-  training_report = train_svm_cv(df.out, folds)
-  if (DUMP_MODEL){
-    # Save report
-    save(training_report, file="svmReport.RData")
-  }
+    training_report = train_svm_cv(df.out, folds)
+### usando la generica funzione di cross validation:
+### training_report = cross_validation_generic(df.out, train_svm, list(COST_LIST,GAMMA_LIST), folds, "SVM")
+    if (DUMP_MODEL){
+                                        # Save report
+        save(training_report, file="svmReport.RData")
+    }
 }else{
   load("svmReport.RData")
 }
@@ -92,10 +94,10 @@ print(opt_cut)
 ### TODO questa operazione si potrebbe fare durante il preprocessing dei dati, tanto é veloce e non cambia niente per svm (penso)
 colnames(df.out) <- make.names(colnames(df.out))
 
-decision_tree.training_report = cross_validation_generic(df.out,
-                                                         train_decision_tree,
-                                                         folds,
-                                                         "Decision Tree")
+decision_tree.training_report = cross_validation_generic(dataframe = df.out,
+                                                         training_function = train_decision_tree,
+                                                         fold_indexes = folds,
+                                                         technique_name_string = "Decision Tree")
 
 ### TODO tutte le analisi del caso
 
