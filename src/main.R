@@ -4,8 +4,8 @@ DUMP_MODEL = FALSE
 TRAIN_MODEL = FALSE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
-source('src/functions/training_decisiontree.R')
-
+source('src/functions/common_functions.R')
+source('src/functions/decision_tree.R')
 
 # ------------- Constants --------------
 DPI <- 300
@@ -61,11 +61,13 @@ folds = createFolds(df.out$award, k = N_FOLDS)
 # ==== SVM ====
 # Train model
 if (TRAIN_MODEL){
-  training_report = train_svm_cv(df.out, folds)
-  if (DUMP_MODEL){
-    # Save report
-    save(training_report, file="svmReport.RData")
-  }
+    training_report = train_svm_cv(df.out, folds)
+### usando la generica funzione di cross validation:
+### training_report = cross_validation_generic(df.out, train_svm, list(COST_LIST,GAMMA_LIST), folds, "SVM")
+    if (DUMP_MODEL){
+                                        # Save report
+        save(training_report, file="svmReport.RData")
+    }
 }else{
   load("svmReport.RData")
 }
@@ -86,8 +88,19 @@ print(opt_cut)
 
 
 #  ==== Decision Tree ====
-# TODO
 
 
-# ------- Model comparison -------
-# TODO
+### In R in generale é meglio non avere spazi dentro al nome di una colonna, rpart senza prima normalizzare i nomi di colonna non funziona
+### TODO questa operazione si potrebbe fare durante il preprocessing dei dati, tanto é veloce e non cambia niente per svm (penso)
+colnames(df.out) <- make.names(colnames(df.out))
+
+decision_tree.training_report = cross_validation_generic(dataframe = df.out,
+                                                         training_function = train_decision_tree,
+                                                         fold_indexes = folds,
+                                                         technique_name_string = "Decision Tree")
+
+### TODO tutte le analisi del caso
+
+
+### ------- Model comparison -------
+### TODO 
