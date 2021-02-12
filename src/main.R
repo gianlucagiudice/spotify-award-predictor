@@ -15,7 +15,7 @@ TERM_FREQUENCY_THLD <- 2 # Term frequency
 YEAR_THLD <- 2005
 POPULARITY_THLD <- 25
 SEED = 830694 + 829664
-NPC <- 6 # Number of principal components
+NPC <- 8 # Number of principal components
 N_FOLDS = 10 # Cross validation parameter
 
 
@@ -38,8 +38,8 @@ df.award = df[[4]]
 df = df[[1]]
 
 # Principal components analysis
-df.pc6 = perform_pca(df.numeric, NPC)
-print(head(df.pc6))
+df.principal_components = perform_pca(df.numeric, NPC)
+print(head(df.principal_components))
 
 # Plot categorical feature
 plot_categorical_feature(df)
@@ -48,7 +48,8 @@ plot_categorical_feature(df)
 artists.tf_thld <- build_term_frequency_matrix(df)
 
 # Build dataframe for training
-df.out = build_out_dataframe(artists.tf_thld, df.pc6, df.categorical, df.award)
+df.out = build_out_dataframe(
+  artists.tf_thld, df.principal_components, df.categorical, df.award)
 # Out dataframe
 print(paste("Dimension of the dataset for training (rows x columns):",
             dim(df.out)[1], dim(df.out)[2]))
