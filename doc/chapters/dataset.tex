@@ -2,7 +2,7 @@
 In questo capitolo viene analizzato il dataset. Viene quindi spiegato da dove è stato preso il dataset, descritte le covariate e viene effettuata un'analisi esplorativa.
 
 \section{Acquisizione del dataset}
-Il dataset completo contenente informazioni sui singoli e riguardo le varie certificazioni non è disponibile da una sola sorgente. Pertanto abbiamo ottenuto le informazioni necessarie da diversi sorgenti per poi integrare i dati.
+Il dataset completo contenente sia le informazioni sui singoli musicali che riguardo le varie certificazioni, ovvero le etichette del dataset, non è disponibile da una sola sorgente. Pertanto abbiamo ottenuto le informazioni necessarie da diversi sorgenti per poi integrare i dati.
 
 \subsection{Dataset spotify - Kaggle}
 Per quanto riguarda i brani con le relative informazioni e caratteristiche del brano, Spotify mette a disposizone un'API da cui si possono ottenere questi dati.
@@ -13,7 +13,7 @@ Con questa tecnica sono stati ottenuti i dati relativi ai brani, un utente ha qu
 
 Il dataset contenente queste informazioni è il file: \verb|data/raw/to_integrate/data.csv|
 \subsection{Premi canzoni - Wikipedia}
-Le informazioni riguardo i premi delle canzoni, ovvero le varie certificazioni vinte, sono disponibili su \href{https://it.wikipedia.org//}{wikipedia.org}. 
+Le informazioni riguardo i premi delle canzoni, ovvero le varie certificazioni vinte, sono disponibili su \href{https://it.wikipedia.org//}{wikipedia.org}. Questa informazione costituisce di fatto l'etichetta per classificare ogni brano musicale.
 
 Nello specifico siamo interessati a:
 \begin{itemize}
@@ -69,7 +69,7 @@ Viene quindi creato uno script per effettuare scraping delle tabelle, il codice 
 Successivamente si integrano le informazioni dei diversi stati, e tipi di certificazione vinti. Il risultato di questa operazione è il file \verb|data/raw/to_integrate/awards_cleaned.csv|.
 
 \section{Descrizione del dataset}
-In questa sezione vengono elencate e descritte le features del dataset.
+In questa sezione vengono elencate e descritte le features del dataset. Trattandosi di un prolema supervisionato, ad ogni istanza viene associata la corretta etichetta, ovvero la classe positiva per i brani musicali che hanno vinto un premio e classe negativa per i brani che non hanno vinto un premio.
 \subsection{Spotify}
 \label{sec:descrizione_spotify}
 Di seguito viene descritto il dataset proveniente da kaggle, ovvero quello contenente le informazioni dei brani.
@@ -119,10 +119,6 @@ Di seguito viene descritto il dataset proveniente da kaggle, ovvero quello conte
 			Energia del brano &
 			Float [0, 1]\\
 			
-			explicit & 
-			Indica se la traccia è esplicita oppure no (linguaggio volgare) &
-			Binario\\
-			
 			instrumentalness & 
 			Contenuto relativo di strumenti musicali nella traccia&
 			Float [0, 1]\\
@@ -131,10 +127,6 @@ Di seguito viene descritto il dataset proveniente da kaggle, ovvero quello conte
 			Metrica riguardante la "positività" della traccia &
 			Intero\\
 			
-			key & 
-			Chiave musicale utilizzata &
-			Intero [0, 11]\\
-			
 			liveness & 
 			Durata relativa della traccia suonata in una performance dal vivo &
 			Float [0, 1]\\
@@ -142,10 +134,6 @@ Di seguito viene descritto il dataset proveniente da kaggle, ovvero quello conte
 			loudness & 
 			Rumorosità della traccia in decibel (dB) &
 			Float [-60, 0]\\
-			
-			mode & 
-			Indica se la traccia parte con una progressione armonica &
-			Booleano\\
 			
 			release\_date & 
 			Anno di rilascio del brano&
@@ -159,9 +147,22 @@ Di seguito viene descritto il dataset proveniente da kaggle, ovvero quello conte
 			BPM della traccia &
 			Float\\
 			
+			key & 
+			Chiave musicale utilizzata &
+			Factor \{0, 1, ..., 11\}\\
+			
+			mode & 
+			Indica se la traccia parte con una progressione armonica &
+			Booleano\\
+			
+			explicit & 
+			Indica se la traccia è esplicita oppure no (linguaggio volgare) &
+			Booleano\\
+			
 			popularity & 
 			Popolarità della traccia &
 			Float [0, 100]\\
+			
 			\hline
 			
 		\end{tabular}
@@ -218,33 +219,125 @@ Il risultato dello scraping della tabella di wikipedia è il seguente:
 	}
 \end{center}
 
-
-\section{Normalizzazione}
-OpenRefine con regex per le date
-
 \section{Data integration}
-Possiamo etichettare i brani come di successo oppure non di successo.
-\subsection{Modellazione struttura documentale}
+Date queste due sorgenti dati, è necessario integrare i dati allo scopo di avere un dataset etichettato, le label saranno appunto se un bravo ha vinto un premio (quindi è di successo) oppure no.
+
+La strategia di entity resolution adottata è considerare un singolo musicale come una singola identità basandosi sul titolo e gli artisti di una canzone. Se il nome del brano musicale è lo stesso e gli artisti coincidono, allora il brano è il medesimo.
+
 \subsection{Record linkage con MongoDB}
-Una roba veloce giusto per spiegare
+A questo scopo i due dataset vengono importati in mongoDB, ogni istanza è rappresentata da un documento. Per la fase di record linkage vengono effettuati i seguenti passi:
 
 \begin{enumerate}
-	\item Import dati mongodb
-	\item Creazione indici
-	\item Preprocessing lowercase
-	\item Unfold campo artista
-	\item Record linkage -> Join basandosi su titolo e artisti
-	\item Lista artisti come stringa
-	\item Dump del database in un file .csv come risultato del dataset per i modelli
+	\item Import dei dataset in mongodb, inizialemnte in due collezioni diverse.
+	\item Normalizzazione dei dati, i campi di join vengono trasformati in lowercase.
+	\item Creazione indici.
+	\item Entrambe le collezioni hanno il campo "artisti" il quale consiste in una stringa contenente la lista degli artisti separati dal carattere ",". Viene quindi eseguito l'unfold del campo "artista" in entrambe le collezioni, costruendo una lista di per ogni documento facendo uno split sul carattere ",".
+	\item Viene eseguite la join sul campo titolo considerando un match valido se l'intersezione tra gli insiemi di artisti dei documenti delle due collezioni non è vuota.
+	\item Viene ritrasformato il campo artista appiattendo la lista e rappresentando l'insieme degli artisti di un brano come una stringa, separando ogni artista con il carattere ",".
+	\item Dump del database in un file .csv, questo è il dataset integrato e verrà usato per il training dei modelli.
 \end{enumerate}
 
 
 
 \section{Analisi esplorativa}
+In questa sezione vengono analizzate e discusse le covariate del dataset.
+\subsection{Assunzioni sul dominio}
+\subsubsection{Anno di uscita singoli}
+Viene per prima cosa analizzata la distribuzione degli anni di uscita nel dataset.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=13cm]{../images/years_distribution.png}
+	\caption{Distribuzione anno delle canozni considerando tutto il dataset.}
+	\label{fig:year_distribution_all}
+\end{figure}
+
+Dal momento che Spotify è una piattaforma recente, si assume che gli utenti ascoltino maggiormente i brani usciti negli ultimi anni. Inoltre le diverse certificazioni come "Disco d'oro" e "Disco di platino" vengono rilasciate considerando il numero di streaming oltre che alle vendite solo da pochi anni. Inoltre con il passare del tempo i trend musicali cambiano, un fattore determinante per fare diventare una canzone di successo.
+
+Con questa giustificazione si ritiene che sia meglio considerare solo i brani musicali dopo un certo anno di uscita. Prendiamo quindi in considerazione solo le canzoni dopo il 2005.
+
+La distribuzione delle canzoni dal 2005 in poi è rappresentata in \autoref{fig:year_distribution_all}. Viene di seguito mostrato il boxplot delle canzoni dopo quella data distinguendo tra classe positiva e negativa, così da vedere se esistono differenze.
+
+ \begin{figure}[H]
+ 	\centering
+ 	\includegraphics[width=13cm]{../images/year_award_comparison.png}
+ 	\caption{Boxplot anno di rilascio, distinguendo tra le classi.}
+ \end{figure}
+ 
+\subsubsection{Popolarità}
+\label{sec:popularity}
+Un altro apsetto che viene analizzato a parte, riguardo il quale è necessario fare ulteriori assunzioni, è il campo popolarità.
+
+Il dataset forinto da Spotify contiene un campo "popularity". Tuttavia come spiegato nella \autoref{sec:successo}, questo campo non viene utilizzato per etichettare una canzone come di successo, si utilizza invece l'informazione delle certificazioni vinte da una canzone (ottenute da wikipedia).
+
+Il campo "popularity" non verrà usato nella fase di training dei modelli, proprio perchè è un dato che non si conosce a priori nel momento in cui un singolo esce, ed è chiaramente influente nel determinare se una canzone vincerà o meno una certificazione e quindi se viene considerata di successo. 
+
+Infatti l'informazione sulla popolarità viene calcolata sul numero di streaming dopo un determinato lasso di temo. Stimare questo valore, dal momento che non è conosciuto fin da subito, è di fatto un problema di regressione ed è molto simile al task di classificazione preso in esame, pertanto il campo viene scartato.
+
+Anche se il campo non viene effettivamente utilizzato, è interessante analizzare la distribuzione dei valori di popolarità delle canzoni nel dataset. Inoltre assumiamo che per il problema trattato, si vogliono classificare delle canzoni che non sono completamente sconosciute. Sarebbe infatti irrealistico pensare che un singolo musicale del tutto sconosciuto vinca dal nulla una certificazione, risultando come brano di successo. 
+
+Si assume di voler utilizzare questi modelli per classificare brani che iniziano ad essere un minimo conosciuti o hanno almeno il potenziale di diventare popolari. Si noti come un brano di poco popolare non implica assolutamente che questo vinca un disco d'oro o di platino.
+
+Viene quindi qui sotto analizzata da distribuzione della popolarità delle canzoni nel dataset.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=13cm]{../images/popularity_distribution.png}
+	\caption{Distribuzione popolarità brani musicali.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=13cm]{../images/popularity_boxplot.png}
+\caption{Boxplot popolarità dei brani musicali.}
+\end{figure}
+
+Analizzando la distribuzione dei valori della popolarità si considerano il primo secondo e terzo quartile, rispettivamente: $q_{1/4} = 49; \; q_{2/4}= 57; \; q_{3/4} = 65$. Inoltre i valori di media e deviazione standard sono: $\mu = 57.83; \; \sigma = 10.12$.
+
+Analizzando la distribuzione dei valori della popolarità viene scelto 25 come threshold, valore 3 volte più estremo della deviazione standard. Si considerano quindi solo i singoli con il valore "popularity" magggiore del threshold. In questo modo il dataset rispecchia l'assunzione sopra spiegata riguardo la popolarità minima, tuttavia si scartano solo i valori davvero estremi per non rendere questa assunzione troppo restrittiva.
 
 \subsection{Distribuzione dei valori}
-\subsubsection{Variabili continue}
+\subsubsection{Variabili numeriche}
+Di seguito viene mostrata la distribuzione di tutte le covariate, distinguendo tra singoli che hanno vinto un premio (Classe positiva) e quelli che non hanno vinto un premio (Classe negativa).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=19cm, angle=270]{../images/pairplot.png}
+	\caption{Pairplot delle covariate.}
+\end{figure}
+
+Dal pairplot possiamo notare come non esiste una netta distinzione nei dati tra brani di successo e brani non di successo. Questo sarà sicuramente un problema in fase di classificazione e potrebbe potrare a basse performance dei modelli. Riteniamo quindi che sia necessario considerare altre features per ben distinguere brani musiclai di successo da quelli non di successo.
+
+Il campo "popularity" ben distingue le due classi, tuttavia come già discusso in \autoref{sec:popularity}, questa covariata non verrà utilizzata per la creazione dei modelli.
+
+Inoltre esiste correlazione tra alcune covariate, come ad esempio tra "energy" e "loudness", questo rispecchia intuitivamente l'idea di come una canzone più energica è anche più rumorosa. La correlazione tra le variabili viene meglio analizzata in \autoref{sec:correlazione}.
+
 \subsubsection{Variabili categoriche}
+Di seguito si esplorano le variabili categoriche del dataset, distinguendo tra classe positiva e negativa.
+
+\begin{figure}[!h]
+
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=10cm]{../images/key_distribution.png}
+		\caption{Variabile key.}
+	\end{subfigure}
+      
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+		\hspace*{-2cm}   
+		\includegraphics[width=10cm]{../images/mode_distribution.png}
+		\caption{Variabile mode.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.58\textwidth}
+		\centering
+		\includegraphics[width=10cm]{../images/explicit_distribution.png}
+		\caption{Variabile explicit.}
+	\end{subfigure}%
+	\caption{Distribuzione delle variabili categoriche.}
+\end{figure}
 
 \subsection{Artisti nelle canzoni}
 \subsubsection{Frequenza artisti}
@@ -252,6 +345,7 @@ Una roba veloce giusto per spiegare
 
 
 \subsection{Correlazione features}
+\label{sec:correlazione}
 
 \subsection{Principal component analysis}
 Prima di PCA normalizzazione del dataset
@@ -263,13 +357,15 @@ NB: Non facciamo il plot delle prime due componenti principali in quanto varianz
 
 
 \section{Scelta delle features}
-\subsection{Normalizzazione e standardizzazione}
-Conversione in lowecase
-Converto in variabili numeriche e factor + label corretta
-\subsection{Dataset proiettato componenti principali}
-\subsection{Variabili categoriche}
-\subsubsection{Key -> Trasformazione a intero}
-\subsection{Artisti in una canzone - BOW}
+
+\subsection{Variabili scartate}
+
+Vengono qui spiegate le features utilizzate
+\subsection{Rappresentazione BOW degli artisti}
+Artisti in lowercase e rappresentazione bow
+
+Uso del threshold
+
 \subsubsection{Threshold freqeunza}
 Viene usato un threshold a 2 per non avere delle canzoni con artisti completamente sconosciuti. Assumiamo quindi di fare previsioni su canzoni cantante da artisti un minimo conosciuti.
 
@@ -277,5 +373,17 @@ Questa assunzione non è molto restrittiva, ci immaginiamo infatti che per vince
 
 Inoltre a causa dell'undersampling è possibile avere diverse canzoni cantate da artisti "sconosciuti" e non avendo scelto una particolare strategia per l'undersampling adottiamo a questo punto l'utilizzo di un threshold
 
-\subsection{Popularity}
-Chiaramente questa feature viene scartata per non creare modelli biased (Non si conosce questa feature quando una canzone esce)
+\subsection{Variabili categoriche}
+\subsubsection{Key - Trasformazione a intero}
+
+\subsection{Coordinate PCA}
+Dataset proiettato componenti principali
+
+\subsection{Normalizzazione e standardizzazione}
+Conversione in lowecase
+Converto in variabili numeriche e factor + label corretta
+
+\subsection{Dataset proiettato componenti principali}
+
+\subsection{Riassunto feature finali utilizzate}
+Tabella

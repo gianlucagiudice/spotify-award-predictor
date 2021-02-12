@@ -56,7 +56,8 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
       geom_histogram(color="black", fill="white", binwidth = 1) +
       scale_x_continuous(
         breaks = seq(min(data_all$year), max(data_all$year), by = 3)) +
-      theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
+      theme(axis.text.x = element_text(angle = 90),
+            plot.title = element_text(hjust = 0.5))
     ggsave("years_distribution.png", plot = last_plot(), path = "images",
            scale = SCALE, dpi = DPI, limitsize = TRUE)
     
@@ -66,7 +67,8 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
         xlab("Year") + ylab("Num. of songs") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
         scale_x_continuous(breaks = c(min(data$year):max(data$year))) +
-        theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
+        theme(axis.text.x = element_text(angle = 90),
+              plot.title = element_text(hjust = 0.5))
     ggsave("years_distribution_thld.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = DPI, limitsize = TRUE)
 
@@ -84,7 +86,8 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
         xlab("Popularity") + ylab("Num. of songs") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
         scale_x_continuous(breaks = seq(0, 100, by = 2)) +
-        theme(axis.text.x = element_text(angle = 90), plot.title = element_text(hjust = 0.5))
+        theme(axis.text.x = element_text(angle = 90),
+              plot.title = element_text(hjust = 0.5))
     ggsave("popularity_distribution.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = DPI, limitsize = TRUE)
 
@@ -92,23 +95,26 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
         ggtitle("Boxplot popularity") +
         ylab("Popularity") +
         geom_boxplot() +
-        #coord_flip() +
+        coord_flip() +
         scale_y_continuous(breaks = seq(0, 100, by = 5)) +
         theme(plot.title = element_text(hjust = 0.5),
-              axis.text.x = element_blank(), axis.ticks.x = element_blank())
+              axis.text.y = element_blank(), axis.ticks.y = element_blank())
     ggsave("popularity_boxplot.png", plot = last_plot(), path = "images",
-           height=17, width=7, units="cm",
+           height=7, width=17, units="cm",
            scale = SCALE * 1.5, dpi = DPI, limitsize = TRUE)
 
     # Minimum popularity
     # Assume we are interested in songs not completely unknown
-    print(c("Popularity quantile:", quantile(data$popularity)))
+    print(c("Popularity quartile:", quantile(data$popularity)))
     data <- subset(data, popularity > popularity_thld)
+    print(c("Popularity mean:", mean(mean(data$popularity))))
+    print(c("Popularity std:", sqrt(var(data$popularity))))
 
     ggplot(data, aes(y=year, x=award)) + 
         ggtitle("Boxplot year award vs not award") +
         xlab("Award won") + ylab("Year") + 
         geom_boxplot() +
+        scale_y_continuous(breaks = seq(min(data$year), max(data$year), by = 1)) +
         theme(plot.title = element_text(hjust = 0.5))
     ggsave("year_award_comparison.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = DPI, limitsize = TRUE)
@@ -203,25 +209,28 @@ plot_categorical_feature <- function(df) {
     ggplot(data=df, aes(explicit, fill=factor(award))) +
     ggtitle("Explicit distribution") +
     geom_bar(colour="black", position="dodge") +
+    scale_y_continuous(breaks = seq(0, 2000, by = 100)) +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("explicit_distribution.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
 
     # Mode feature
     ggplot(data=df, aes(mode, fill=factor(award))) +
     ggtitle("Mode distribution") +
     geom_bar(colour="black", position="dodge") +
+    scale_y_continuous(breaks = seq(0, 1300, by = 100)) +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("mode_distribution.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
 
     # Key feature
     ggplot(data=df, aes(key, fill=factor(award))) +
     ggtitle("Key distribution") +
     geom_bar(colour="black", position="dodge") +
+    scale_y_continuous(breaks = seq(0, 300, by = 20)) +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("key_distribution.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
 }
 
 # Bag of words representation for artists
@@ -250,8 +259,9 @@ build_term_frequency_matrix <- function(df) {
         scale = SCALE, dpi = DPI, limitsize = TRUE)
     print(c("Occurrence quantile:", quantile(artists.occurrence$occurrence)))
     # Threshold over occurrence
-    artists.occurrence_thld = subset(artists.occurrence,
-                                    artists.occurrence$occurrence >= TERM_FREQUENCY_THLD)
+    artists.occurrence_thld =
+      subset(artists.occurrence,
+             artists.occurrence$occurrence >= TERM_FREQUENCY_THLD)
     ggplot(artists.occurrence_thld, aes(occurrence)) +
     ggtitle(
         paste("Frequency of occurrences of artists among songs ( ccurrence >=",
@@ -263,7 +273,8 @@ build_term_frequency_matrix <- function(df) {
                 plot.title = element_text(hjust = 0.5))
     ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = DPI, limitsize = TRUE)
-    print(c("Occurrence quantile:", quantile(artists.occurrence_thld$occurrence)))
+    print(c("Occurrence quantile:",
+            quantile(artists.occurrence_thld$occurrence)))
     
     # Wordcloud overall
     plot_wordcloud(artists.occurrence_thld, "images/wordcloud_overall.png")
