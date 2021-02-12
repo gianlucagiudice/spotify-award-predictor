@@ -1,8 +1,9 @@
 ### TODO forse la creazione dei fold puó essere spostata dal main a questa funzione, i fold singolarmente non vengono mai utilizzati tranne che in questa funzione.
 
 ### Performs a k-cross validation (where k is the number of fold_indexes)
-### 
-cross_validation_generic <- function(dataframe, training_function, fold_indexes, technique_name_string){
+### The training_function first argument must be the training set, the rest of the arguments must be supplied in the training_function_args list
+
+cross_validation_generic <- function(dataframe, training_function, training_function_args = list(), fold_indexes, technique_name_string){
     performance.positive = c()
     performance.negative = c()
 
@@ -17,8 +18,9 @@ cross_validation_generic <- function(dataframe, training_function, fold_indexes,
         }
 
         print(paste("Training ", technique_name_string, " - fold ", i, "/", length(fold_indexes)))
-        trained_model = training_function(dataframe[train_idx,])
-
+        ## trained_model = training_function(dataframe[train_idx,])
+        trained_model = do.call(training_function, append(list(dataframe[train_idx,]),
+                                                          training_function_args))
         ## Evaluate fold performance
         fold.positive_performance = list(evaluate_performance(
             trained_model, dataframe[test_idx, ], "TRUE"))
