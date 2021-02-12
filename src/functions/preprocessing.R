@@ -114,10 +114,12 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
         ggtitle("Boxplot year award vs not award") +
         xlab("Award won") + ylab("Year") + 
         geom_boxplot() +
+        coord_flip() +
         scale_y_continuous(breaks = seq(min(data$year), max(data$year), by = 1)) +
         theme(plot.title = element_text(hjust = 0.5))
     ggsave("year_award_comparison.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = DPI, limitsize = TRUE)
+           height=15, width=30, units="cm",
+           scale = SCALE, dpi = DPI, limitsize = TRUE)
 
     # Award vs no award
     ggplot(data, aes(award)) +
@@ -130,7 +132,7 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
               axis.text.x = element_text(angle = 90))
     ggsave("awards_distribution.png", plot = last_plot(), path = "images",
            height=15, width=40, units="cm",
-           scale = SCALE, dpi = DPI, limitsize = TRUE)
+           scale = SCALE / 1.25, dpi = DPI, limitsize = TRUE)
 }
 
 # Build a balanced dataset
@@ -148,7 +150,7 @@ build_balanced_dataset <- function(data, seed) {
 build_dataframe <- function(balanced) {
     # Keep only numeric features
     df = balanced
-    df.numeric = subset(df, select=c(3, 5:8, 10, 12, 13, 15:17))
+    df.numeric = subset(df, select=c(3, 5:8, 10, 12, 13, 15:16))
     df.award = df$award
     df.categorical = subset(df, select=c(9, 11, 14))
     # Standardize
@@ -180,18 +182,25 @@ build_dataframe <- function(balanced) {
 # Principal component analysis
 perform_pca <- function(active, ncp) {
     pca = PCA(active, scale.unit = TRUE, ncp = ncp)
-    p <- fviz_eig(pca, addlabels = TRUE, ylim = c(0, 100)) + 
-        labs(title = "Variance explained + cumulative variance")
-    # Cumulative variance
-    cum_var = data.frame(x=1:length(pca$eig[, 3]), y=pca$eig[, 3])
-    print("PCA Cumulative variance:")
-    print(cum_var)
-    p <- p +
-    geom_point(data=cum_var, aes(x, y)) + 
-    geom_line(data=cum_var, aes(x, y), color="red"); p
+    print("PCA results:")
+    print(pca$eig)
+    
+    # Pca explained variance plot
+    pca_df = as.data.frame.matrix(pca$eig)
+    pca_df$id = 1:nrow(pca_df)
+    ggplot(data = pca_df) +
+      ggtitle("Explained variance + cumulative variance") +
+      xlab("Principal component") + ylab("Explained variance") +
+      geom_col(aes(x = id, y = pca_df[,2]), color = "black", fill = "white") +
+      geom_line(aes(x = id, y = pca_df[,3]), color="red") +
+      geom_point(aes(x = id, y = pca_df[,3]), color="red") +
+      scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+      scale_x_continuous(breaks = seq(0, nrow(pca_df), by = 1)) +
+      theme(plot.title = element_text(hjust = 0.5))
     ggsave("pca_variance_explained.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
-    # Color by cos2 values: quality on the factor map
+           scale = SCALE / 1.25, dpi = DPI, limitsize = TRUE)
+    
+    # PCA contribution
     fviz_pca_var(pca, col.var = "cos2",
                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
                 repel = TRUE)
@@ -202,9 +211,9 @@ perform_pca <- function(active, ncp) {
     ggsave("pca_feature_contribution.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
     # Projected data points over the 6 principal components
-    df.pc6 = pca$ind$coord
+    df.principal_components = pca$ind$coord
     
-    return(df.pc6)
+    return(df.principal_components)
 }
 
 # Categorical feature
@@ -256,31 +265,28 @@ build_term_frequency_matrix <- function(df) {
         ggtitle("Frequency of occurrences of artists among songs") +
         xlab("Occurrence in songs") + ylab("Frequency") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
-        scale_x_continuous(breaks = c(0:100)) +
-        scale_y_continuous(breaks = seq(0, 1500, by = 50)) +
+        scale_x_continuous(breaks = seq(0, 100, by = 1)) +
+        scale_y_continuous(breaks = seq(0, 1500, by = 150)) +
         theme(axis.text.x = element_text(angle = 90),
                 plot.title = element_text(hjust = 0.5))
     ggsave("artists_occurence.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = DPI, limitsize = TRUE)
-    print(c("Occurrence quantile:", quantile(artists.occurrence$occurrence)))
+        scale = SCALE / 1.5, dpi = DPI, limitsize = TRUE)
     # Threshold over occurrence
     artists.occurrence_thld =
       subset(artists.occurrence,
              artists.occurrence$occurrence >= TERM_FREQUENCY_THLD)
     ggplot(artists.occurrence_thld, aes(occurrence)) +
     ggtitle(
-        paste("Frequency of occurrences of artists among songs ( ccurrence >=",
+        paste("Frequency of occurrences of artists among songs ( occurrence >=",
             TERM_FREQUENCY_THLD, ")")) +
         xlab("Occurrence in songs") + ylab("Frequency") + 
         geom_histogram(color="black", fill="white", binwidth = 1) +
-        scale_x_continuous(breaks = c(0:100)) +
+      scale_x_continuous(breaks = seq(0, 100, by = 1)) +
         scale_y_continuous(breaks = seq(0, 1500, by = 20)) +
         theme(axis.text.x = element_text(angle = 90),
                 plot.title = element_text(hjust = 0.5))
     ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
         scale = SCALE, dpi = DPI, limitsize = TRUE)
-    print(c("Occurrence quantile:",
-            quantile(artists.occurrence_thld$occurrence)))
     
     # Wordcloud overall
     plot_wordcloud(artists.occurrence_thld, "images/wordcloud_overall.png")
@@ -322,21 +328,16 @@ plot_wordcloud <- function(df, image_name){
   wordcloud_graph <- wordcloud2(wordcloud_df)
   wordcloud_graph
   saveWidget(wordcloud_graph, "/tmp/tmp.html", selfcontained = F)
-  webshot("/tmp/tmp.html", image_name, delay=8, vwidth = 2000, vheight=2000)
+  webshot("/tmp/tmp.html", image_name, delay=15, vwidth = 2000, vheight=1250)
     
 }
 
 # Build dataframe for training
-build_out_dataframe <- function(tf, pc6, categorical, award){
+build_out_dataframe <- function(tf, principal_components, categorical, award){
     # Term frequency
     df.out = tf
     # Principal components
-    df.out$pc1 = pc6[,1]
-    df.out$pc2 = pc6[,2]
-    df.out$pc3 = pc6[,3]
-    df.out$pc4 = pc6[,4]
-    df.out$pc5 = pc6[,5]
-    df.out$pc6 = pc6[,6]    
+    df.out = cbind(df.out, principal_components)
     # Categorical features
     df.out$explicit = as.integer(categorical$explicit) - 1
     df.out$mode = as.integer(categorical$mode) - 1

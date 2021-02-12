@@ -15,7 +15,7 @@ TERM_FREQUENCY_THLD <- 2 # Term frequency
 YEAR_THLD <- 2005
 POPULARITY_THLD <- 25
 SEED = 830694 + 829664
-NPC <- 8 # Number of principal components
+NPC <- 7 # Number of principal components
 N_FOLDS = 10 # Cross validation parameter
 
 
