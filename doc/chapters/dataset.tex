@@ -240,8 +240,65 @@ A questo scopo i due dataset vengono importati in mongoDB, ogni istanza è rappr
 
 
 \section{Analisi esplorativa}
-In questa sezione vengono analizzate e discusse le covariate del dataset.
+In questa sezione vengono analizzate e discusse le covariate del dataset. Dopo la fase di record linkage le feature del dataset finale sono:
+
+\begin{table}[H]
+	\begin{tabular}{l|cccccc}
+		
+		\textbf{Covariata} &\textbf{id }&\textbf{name }&\textbf{artists }&\textbf{year }&\textbf{duration\_ms }&\textbf{acousticness} \\
+		\hline
+		\textbf{Utilizzata}& No & No & Si & No & Si & Si \\
+	\end{tabular}
+	
+	\begin{tabular}{l|cccc}
+		\textbf{Covariata} & \textbf{danceability}  & \textbf{energy} & \textbf{instrumentalness} & \textbf{valence}  \\
+		\hline
+		\textbf{Utilizzata} & Si  & Si & Si & Si \\
+	\end{tabular}
+	
+	\begin{tabular}{l|ccccc}
+		\textbf{Covariata} & \textbf{liveness} & \textbf{loudness} &\textbf{ release\_date} & \textbf{speechiness} & \textbf{tempo} \\
+		\hline
+		\textbf{Utilizzata }& Si & Si & No & Si & Si \\
+	\end{tabular}
+	
+	\begin{tabular}{l|ccccc}
+		\textbf{Covariata} & \textbf{key} & \textbf{mode} & \textbf{explicit} & \textbf{popularity} & \textbf{\underline{award}} \\
+		\hline
+		\textbf{Utilizzata} & Si & Si & Si & No & Label \\	
+	\end{tabular}
+\caption{Tabella riassuntiva di tutte le features del dataset.}
+\label{tab:features}
+\end{table}
+
+Sotto viene riportata una tabella riassuntiva riguardo il numero di istanze nel dataset. Il significato dei threshold viene spiegato nella sezione successiva (\autoref{sec:assunzioni}).
+
+	\begin{table}[H]
+		
+		\begin{center}
+		
+		\begin{tabular}{ |l|c| }
+			\hline
+			\multicolumn{1}{ |c }{\textbf{DATASET}} &
+			\multicolumn{1}{ c |}{\textbf{\# ISTANZE}} \\
+			\hline
+			\hline
+			Dataset completo & 
+			$151762$\\
+			Dataset ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
+			$26134$\\
+			Dataset bilanciato ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
+			$3670$\\
+			\hline
+		\end{tabular}
+		
+	\end{center}
+		\caption{Numero di istanze nel dataset.}
+	\end{table}
+		
+
 \subsection{Assunzioni sul dominio}
+\label{sec:assunzioni}
 \subsubsection{Anno di uscita singoli}
 Viene per prima cosa analizzata la distribuzione degli anni di uscita nel dataset.
 
@@ -289,7 +346,7 @@ Viene quindi qui sotto analizzata da distribuzione della popolarità delle canzo
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=13cm]{../images/popularity_boxplot.png}
+\includegraphics[width=14cm]{../images/popularity_boxplot.png}
 \caption{Boxplot popolarità dei brani musicali.}
 \end{figure}
 
@@ -297,9 +354,28 @@ Analizzando la distribuzione dei valori della popolarità si considerano il prim
 
 Analizzando la distribuzione dei valori della popolarità viene scelto 25 come threshold, valore 3 volte più estremo della deviazione standard. Si considerano quindi solo i singoli con il valore "popularity" magggiore del threshold. In questo modo il dataset rispecchia l'assunzione sopra spiegata riguardo la popolarità minima, tuttavia si scartano solo i valori davvero estremi per non rendere questa assunzione troppo restrittiva.
 
+Dopo queste operazioni di riduzione del numero di istanze del dataset in base alle soglie, il numero di istanze diventa $26134$.
+
+
+\subsection{Creazione dataset bilanciato}
+Dopo aver ridotto il dataset in base alle diverse soglie si vuole vedere il numero di istanze appartenente alla classe positiva e negativa. Per classe positivia si intendono i brani che hanno vinto un premio e sono quindi di successo, viceversa per la classe negativa.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{../images/awards_distribution.png}
+	\caption{Istanze positive e negative.}
+	\label{fig:award_distribution}
+\end{figure}
+
+\subsubsection{Undersampling}
+Dalla \autoref{fig:award_distribution} emerge che il dataset è sbilanciato, il rapporto tra classe negativa e positiva è circa $14:1$. Dal momento che questo può creare problemi in fasi di training, si sceglie di costrutire un dataset bilanciato a partire da tutte le istanze. Come strategia per la costruzione di questo nuovo dataset vengono scelte casualmente un numero di istanze negative pari al numero di istanze negative.
+
+\subsection{Preprocessing}
+Per quanto riguarda le variabili numeriche queste vengono standardizzare, ovvero per ogni covariata si trasformano gli individui in modo da ottenere dei valori tali che $\mu = 0;\; \sigma = 1$. Questa è sicuramente una best practice ma è cruciale per quanto riguarda la PCA, tecinca che viene utilizzata e spiegata in \autoref{sec:pca}.
+
 \subsection{Distribuzione dei valori}
 \subsubsection{Variabili numeriche}
-Di seguito viene mostrata la distribuzione di tutte le covariate, distinguendo tra singoli che hanno vinto un premio (Classe positiva) e quelli che non hanno vinto un premio (Classe negativa).
+Di seguito viene mostrata la distribuzione delle covariate, distinguendo tra singoli che hanno vinto un premio (Classe positiva) e quelli che non hanno vinto un premio (Classe negativa).
 
 Dal pairplot della \autoref{fig:pairplot} possiamo notare come non esiste una netta distinzione nei dati tra brani di successo e brani non di successo. Questo sarà sicuramente un problema in fase di classificazione e potrebbe potrare a basse performance dei modelli. Riteniamo quindi che sia necessario considerare altre features per ben distinguere brani musiclai di successo da quelli non di successo.
 
@@ -309,7 +385,6 @@ Inoltre esiste correlazione tra alcune covariate, come ad esempio tra "energy" e
 
 
 \begin{figure}[H]
-	
 	\hspace*{-1.5cm}   
 	\centering
 	\includegraphics[width=23cm, angle=270]{../images/pairplot.png}
@@ -353,32 +428,110 @@ Vine ora considareato il numero di occorrenze di ogni artista tra tutte le canzo
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=13cm]{../images/artists_occurence.png}
+	\includegraphics[width=10cm]{../images/artists_occurence.png}
 	\caption{Frequenza delle occorenze degli artisti nelle canzoni.}
 \end{figure}
 
-Come possiamo notare da questo grafico, la maggior parte degli artisti hanno fatto solo una canzone.
+Come possiamo notare da questo grafico, la maggior parte degli artisti hanno fatto solo una canzone. Questo aspetto verrà tenuto in considerazione per la rappresentazione BOW degli artisti, come spiegato in \autoref{sec:bow}
+
 \subsubsection{Wordcloud}
+Si vuole ora anlizzare se esiste una differenza tra artisti che hanno realizzato brani di successo rispetto a quelli non di successo. Viene prima di tutto mostrato il wordcloud degli artisti tra tutte le canzoni, senza fare distinzione tra classe positiva e negativa.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{../images/wordcloud_overall_fix.png}
+	\caption{Wordcloud artisti considerando entrambe le classi.}
+\end{figure}
+
+Viene quindi mostrato il worcloud degli artisti andando a considerare solo le canzoni di successo:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{../images/wordcloud_positive_fix.png}
+	\caption{Wordcloud artisti considerando solo la classe positiva.}
+\end{figure}
+
+Analogamente il worcloud degli artisti considerando solo le canzoni non di successo:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{../images/wordcloud_negative_fix.png}
+	\caption{Wordcloud artisti considerando solo la classe negativo.}
+\end{figure}
+
+Dai grafici emerge che molti artisti compaiono sia nella classe positiva che in quella negativa. Tuttavia ci sono alcuni artisti e.g. "Taylor Swift" o "Rihanna" che spiccano nella classe di successo mentre sono meno frequenti nei brani non di successo. A fronte di questa analisi riteniamo che considerare gli artisti all'interno di un brano possa essere utile per distinguere le due classi. Viene quindi utilizzata una rappresentazione BOW (spiegato in \autoref{sec:bow}) per utilizzare questa informazione durante la fase di training dei modelli.
 
 
-\subsection{Correlazione features}
+\subsection{Correlazione tra features}
 \label{sec:correlazione}
+Si considera ora la correlazione tra le faetures numeriche. A questo scopo calcoliamo la matrice di correlazione e la rappresentiamo qui sotto per mezzo di una heatmap:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm]{../images/correlation.png}
+	\caption{Matrice di correlazione.}
+\end{figure}
+
+Da questa immagine si può notare come alcune covariate, ad esempio "energy" e "loudness", sono correlate positivamente, mentre altre covariate come "acousticness" e "energy" oppure "acousticness"e "loudness" sono correlate negativamente. Questo rispecchia il senso comune di energia di una canzone, e ci si aspetta che al crescere di questa aumenta anche la loudness di un brano.
 
 \subsection{Principal component analysis}
-Prima di PCA normalizzazione del dataset
+\label{sec:pca}
+Dal momento che esiste correlazione tra le covariate, viene utilizzata la tecnica PCA con lo scopo di ridurre la dimensione del dataset spiegando la maggior parte della varianza.
 
-NB: Non facciamo il plot delle prime due componenti principali in quanto varianza spiegata dalle prime due componenti molto bassa
+La PCA viene effettuata solo sulle features numeriche, si noti inoltre come il dataset è stato precedentemente standardizzato, in questo modo i valori numerici hanno media $0$ e deviazione standard $1$. Questa è una condizione necessaria per applicare correttamente la tecnica PCA.
 
-\subsection{Creazione dataset bilanciato}
-\subsubsection{Undersampling}
+
+A partire dalla matrice di covarianza viene effettuata la decomposizione agli autovalori, si ottengono quindi gli autovettori con gli autovalori associati. Ordinando gli autovalori in ordine decrescente viene mostrata la varianza spiegata da ogni componente principale, oltre che alla varianza spiegata cumulata.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=13cm]{../images/pca_variance_explained.png}
+	\caption{Varianza spiegata dalle componenti principali.}
+\end{figure}
+
+In tabella viene riportata la varianza spiegata cumulata:
+
+
+	\begin{tabular}{|l c c c c c c c c c|} 
+		\hline
+		PC1 & PC2 & PC3 & PC4 & PC5 & PC6 & PC7 & PC8 & PC9 & PC10\\
+		\hline
+		29.72 &
+		44.22 &
+		55.39 &
+		65.20 &
+		74.33 &
+		82.45 &
+		89.58 &
+		94.78 &
+		98.26 &
+		100.00 \\
+		\hline
+		
+	\end{tabular}
+
+
+Sulla base di questi dati è possibile notare come le prime $7$ componenti principali spiegano circa il $90\%$ della varianza totale. Per questo motivo si sceglie di proiettare il dataset dallo spazio originale nel nuovo sottospazio trovato con la PCA. Questo nuovo spazio ha dimensione pari a $7$, ovvero il numero di componenti principali che si è scelto di utilizzare.
+
 
 
 \section{Scelta delle features}
+In questa sezione viene spigata e giustificata la scelta di ogni feature.
 
 \subsection{Variabili scartate}
+Come si può notare dalla \autoref{tab:features} non tutti le features vengono utilizzate. Le variabili scartate sono le seguenti:
+
+\begin{itemize}
+	\item \textbf{id}:
+	\item \textbf{name}:
+	\item \textbf{year}:
+	\item \textbf{release\_data}:
+	\item \textbf{popularity}:
+\end{itemize}
 
 Vengono qui spiegate le features utilizzate
 \subsection{Rappresentazione BOW degli artisti}
+\label{sec:bow}
 Artisti in lowercase e rappresentazione bow
 
 Uso del threshold
@@ -392,6 +545,7 @@ Inoltre a causa dell'undersampling è possibile avere diverse canzoni cantate da
 
 \subsection{Variabili categoriche}
 \subsubsection{Key - Trasformazione a intero}
+Vengono trasformate su range 0 1, codificate in intero ecc...
 
 \subsection{Coordinate PCA}
 Dataset proiettato componenti principali
@@ -403,4 +557,15 @@ Converto in variabili numeriche e factor + label corretta
 \subsection{Dataset proiettato componenti principali}
 
 \subsection{Riassunto feature finali utilizzate}
+
+Numero delle istanze
+
+
+151762
+
+26134
+
+3670
+
+
 Tabella
