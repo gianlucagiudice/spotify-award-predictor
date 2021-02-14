@@ -1,6 +1,3 @@
-### OPTIMAL COMPLEXITY PARAMETER
-
-
 ### TRAINING 
 
 train_decision_tree <- function(training_data){

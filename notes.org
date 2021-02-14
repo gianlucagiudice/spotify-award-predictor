@@ -1,2 +1,3 @@
-Attributes values range from 0 to 4.
-(0=Never, 1=Seldom, 2=Averagely, 3=Frequently, 4=Always) [[https://medium.com/analytics-vidhya/a-logistic-model-for-predicting-divorce-rates-among-couples-implemented-using-the-statsmodel-api-763e03d29d68][source]]
+Macro average perché tutte le class, istanze con award vinto o no sono ugualmente importanti.
+
+Durante il training del decision tree fatto da CART viene giá fatto un pruning dell'albero.

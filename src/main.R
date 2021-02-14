@@ -104,10 +104,13 @@ decision_tree.training_report = cross_validation_generic(dataframe = df.out,
 
 decision_tree.performance.positive_folds = decision_tree.training_report[[1]]
 decision_tree.performance.negative_folds = decision_tree.training_report[[2]]
+
 ## Class performance
 decision_tree.performance.positive = combine_folds_performance(decision_tree.performance.positive_folds)
 decision_tree.performance.negative = combine_folds_performance(decision_tree.performance.negative_folds)
+
 plot_class_performance_generic(decision_tree.performance.positive[5:7], decision_tree.performance.negative[5:7], "decision_tree_class_performance.png")
+
 ## Confusion matrix
 decision_tree.performance.confusion_matrix = combine_folds_cm(decision_tree.performance.positive_folds)
 plot_performance_generic(decision_tree.performance.confusion_matrix, decision_tree.performance.positive, decision_tree.performance.negative, "decision_tree_performance.png")
