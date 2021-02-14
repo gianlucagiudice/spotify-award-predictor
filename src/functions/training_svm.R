@@ -12,9 +12,7 @@ for (library in libraries){
   library(library, character.only = TRUE)
 }
 
-
 # ------------- Constants --------------
-NUM_CORES <- detectCores()
 COST_LIST = 10^(-3:1)
 GAMMA_LIST = 10^(-5:-1)
 

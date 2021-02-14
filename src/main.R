@@ -68,7 +68,8 @@ if (TRAIN_MODEL){
     
     #expand.grid(C = cost_list, sigma = gamma_list)
     #method = "svmRadial"
-    #training_report = cross_validation(df.out, train_svm, list(COST_LIST,GAMMA_LIST), folds, "SVM")
+    #ßtraining_report = cross_validation(df.out, "svmRadial", SEED, N_FOLDS, NUM_CORES)
+    
     if (DUMP_MODEL){
         # Save report
         save(training_report, file="svmReport.RData")
