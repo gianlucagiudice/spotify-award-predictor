@@ -18,6 +18,8 @@ SEED = 830694 + 829664
 NPC <- 7 # Number of principal components
 N_FOLDS = 10 # Cross validation parameter
 
+NUM_CORES = detectCores(logical = TRUE) # Number of cores
+
 
 # ------------ Preprocessing ------------
 # Read the dataset 
@@ -73,7 +75,8 @@ train_target_model(dataframe = df.reduced,
                    method = method,
                    tune_grid = tune_grid,
                    seed = SEED,
-                   n_folds = N_FOLDS)
+                   n_folds = N_FOLDS,
+                   num_cores = NUM_CORES)
 
 #  ==== Decision Tree ====
 method = "rpart"

@@ -1,8 +1,14 @@
 ### ------------- Constants --------------
 NUM_CORES <- detectCores()
 
-train_target_model <- function(dataframe, method, tune_grid = NULL, seed,
-                               n_folds, train_model = TRUE, dump_model = TRUE){
+train_target_model <- function(dataframe, method, tune_grid = NULL,
+                               seed, n_folds, train_model = TRUE,
+                               dump_model = TRUE, num_cores = 1){
+    
+    # Start cluster
+    cl <- makePSOCKcluster(num_cores)
+    registerDoParallel(cl)
+    
     # Train model
     filename = paste(method, "_report.RData", sep="")
     if (TRAIN_MODEL){
@@ -18,6 +24,11 @@ train_target_model <- function(dataframe, method, tune_grid = NULL, seed,
     }else{
         load(filename)
     }
+    
+    # Stop cluster
+    stopCluster(cl)
+    
+    # Performance
     performance.positive_folds = training_report[[1]]
     performance.negative_folds = training_report[[2]]
     # Class performance

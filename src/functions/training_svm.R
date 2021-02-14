@@ -3,7 +3,7 @@ library(parallel)
 library(caret)
 
 libraries = c("e1071", "caret", "ROCR", "C50", "pROC", "parallel",
-              "libcoin", "kernlab")
+              "libcoin", "kernlab", "doParallel")
 
 if (INSTALL_LIBRARIES){
   install.packages(libraries, dependencies = TRUE, character.only = TRUE)
