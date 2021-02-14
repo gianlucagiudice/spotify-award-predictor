@@ -332,18 +332,21 @@ plot_wordcloud <- function(df, image_name){
     
 }
 
-# Build dataframe for training
+### Build dataframe for training
 build_out_dataframe <- function(tf, principal_components, categorical, award){
-    # Term frequency
+    ## Term frequency
     df.out = tf
-    # Principal components
+    ## Principal components
     df.out = cbind(df.out, principal_components)
-    # Categorical features
+    ## Categorical features
     df.out$explicit = as.integer(categorical$explicit) - 1
     df.out$mode = as.integer(categorical$mode) - 1
     df.out$key = range01(as.integer(categorical$key) - 1)
-    # Label
+    ## Label
     df.out$award = award
+
+    ## Normalize column names by removing spaces
+    colnames(df.out) <- make.names(colnames(df.out))
 
     return(df.out)
 }
