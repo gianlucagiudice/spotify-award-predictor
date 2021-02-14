@@ -1,7 +1,7 @@
 # ------- Load custom functions -------
 INSTALL_LIBRARIES = FALSE
 DUMP_MODEL = FALSE
-TRAIN_MODEL = FALSE
+TRAIN_MODEL = TRUE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
 source('src/functions/common_functions.R')
@@ -55,66 +55,55 @@ print(paste("Dimension of the dataset for training (rows x columns):",
             dim(df.out)[1], dim(df.out)[2]))
 
 
+## ----------- DA RIMUOVERE -----------
+# Reduced dataframe for tests purpose
+df.reduced = subset(df.out, select = c(661, 662, 666))
+df.reduced = union_all(df.reduced[1:25,], df.reduced[2500:2525,])
+## ----------- DA RIMUOVERE -----------
+
+
 # ------------ Training ------------
-set.seed(SEED)
-folds = createFolds(df.out$award, k = N_FOLDS)
-
 # ==== SVM ====
-# Train model
-if (TRAIN_MODEL){
-    training_report = train_svm_cv(df.out, folds)
-### usando la generica funzione di cross validation:
-### training_report = cross_validation_generic(df.out, train_svm, list(COST_LIST,GAMMA_LIST), folds, "SVM")
-    
-    #expand.grid(C = cost_list, sigma = gamma_list)
-    #method = "svmRadial"
-    #ßtraining_report = cross_validation(df.out, "svmRadial", SEED, N_FOLDS, NUM_CORES)
-    
-    if (DUMP_MODEL){
-        # Save report
-        save(training_report, file="svmReport.RData")
-    }
-}else{
-  load("svmReport.RData")
-}
-performance.positive_folds = training_report[[1]]
-performance.negative_folds = training_report[[2]]
-# Class performance
-performance.positive = combine_folds_performance(performance.positive_folds)
-performance.negative = combine_folds_performance(performance.negative_folds)
-plot_class_performance(performance.positive[5:7], performance.negative[5:7])
-# Confusion matrix
-confusion_matrix = combine_folds_cm(performance.positive_folds)
-plot_performance(confusion_matrix, performance.positive, performance.negative)
-plot_cm(confusion_matrix)
-# AUC
-opt_cut = plot_auc(df.out, 'radial')
-print("Optimal cutoff:")
-print(opt_cut)
-
+method = "svmRadial"
+tune_grid = expand.grid(
+  C = COST_LIST,
+  sigma = GAMMA_LIST)
+## ------ CAMBIARE IL DATAFRAME!!!!!!!! ------------
+train_target_model(dataframe = df.reduced,
+                   method = method,
+                   tune_grid = tune_grid,
+                   seed = SEED,
+                   n_folds = N_FOLDS)
 
 #  ==== Decision Tree ====
-
-decision_tree.training_report = cross_validation(dataframe = df.out,
-                                                 method = "rpart",
+method = "rpart"
+training_report.decision_tree = cross_validation(dataframe = df.out,
+                                                 method = method,
                                                  seed = SEED,
                                                  n_folds = N_FOLDS)
 
 ### TODO tutte le analisi del caso
-
-decision_tree.performance.positive_folds = decision_tree.training_report[[1]]
-decision_tree.performance.negative_folds = decision_tree.training_report[[2]]
+decision_tree.performance.positive_folds = training_report.decision_tree[[1]]
+decision_tree.performance.negative_folds = training_report.decision_tree[[2]]
 
 ## Class performance
 decision_tree.performance.positive = combine_folds_performance(decision_tree.performance.positive_folds)
 decision_tree.performance.negative = combine_folds_performance(decision_tree.performance.negative_folds)
 
-plot_class_performance_generic(decision_tree.performance.positive[5:7], decision_tree.performance.negative[5:7], "decision_tree_class_performance.png")
+plot_class_performance(
+  decision_tree.performance.positive[5:7],
+  decision_tree.performance.negative[5:7],
+  method)
 
 ## Confusion matrix
 decision_tree.performance.confusion_matrix = combine_folds_cm(decision_tree.performance.positive_folds)
-plot_performance_generic(decision_tree.performance.confusion_matrix, decision_tree.performance.positive, decision_tree.performance.negative, "decision_tree_performance.png")
-plot_cm_generic(decision_tree.performance.confusion_matrix, "decision_tree_confusion_matrix.png")
+plot_performance(
+  decision_tree.performance.confusion_matrix,
+  decision_tree.performance.positive,
+  decision_tree.performance.negative, "decision_tree_performance.png")
+plot_cm(
+  decision_tree.performance.confusion_matrix,
+  method)
 
 ### ------- Model comparison -------
 ### TODO 

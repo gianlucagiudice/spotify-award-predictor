@@ -1,10 +1,49 @@
 ### ------------- Constants --------------
 NUM_CORES <- detectCores()
 
+train_target_model <- function(dataframe, method, tune_grid = NULL, seed,
+                               n_folds, train_model = TRUE, dump_model = TRUE){
+    # Train model
+    filename = paste(method, "_report.RData", sep="")
+    if (TRAIN_MODEL){
+        training_report = cross_validation(dataframe = dataframe,
+                                               method = method,
+                                               seed = seed,
+                                               tune_grid = tune_grid,
+                                               n_folds = n_folds)
+        if (DUMP_MODEL){
+            # Save report
+            save(training_report, file=filename)
+        }
+    }else{
+        load(filename)
+    }
+    performance.positive_folds = training_report[[1]]
+    performance.negative_folds = training_report[[2]]
+    # Class performance
+    performance.positive = combine_folds_performance(performance.positive_folds)
+    performance.negative = combine_folds_performance(performance.negative_folds)
+    plot_class_performance(
+        performance.positive[5:7],
+        performance.negative[5:7],
+        method)
+    # Confusion matrix
+    confusion_matrix = combine_folds_cm(performance.positive_folds)
+    plot_performance(
+        confusion_matrix,
+        performance.positive,
+        performance.negative,
+        method)
+    plot_cm(confusion_matrix, method)
+    # AUC
+    #opt_cut = plot_auc(dataframe, 'radial')
+    #print("Optimal cutoff:")
+    #print(opt_cut)
+}
 
-cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds, num_threads = detectCores()){
+cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds){
     set.seed(seed)
-    fold_indexes = createFolds(df.out$award, k = N_FOLDS)
+    fold_indexes = createFolds(dataframe$award, k = N_FOLDS)
 
     performance.positive = c()
     performance.negative = c()
@@ -22,10 +61,9 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds,
         print(paste("Training ", method, " - fold ", i, "/", length(fold_indexes)))
 
         trained_model = train(award ~ .,
-                              data = df[train_idx,],
+                              data = dataframe[train_idx,],
                               method = method,
-                              tuneGrid = tune_grid,
-                              num.threads = num_threads)                                           
+                              tuneGrid = tune_grid)                                           
 
         ## Evaluate fold performance
         fold.positive_performance = list(evaluate_performance(
@@ -75,7 +113,7 @@ combine_folds_cm <- function(performance_folds){
 }
 
 ## Plot model performance
-plot_class_performance <- function(positive, negative, filename){
+plot_class_performance <- function(positive, negative, method){
     precision <- c(positive[1], negative[1])
     recall <- c(positive[2], negative[2])
     f1 <- c(positive[3], negative[3])
@@ -96,12 +134,13 @@ plot_class_performance <- function(positive, negative, filename){
         scale_y_continuous(breaks=seq(0, 1, 0.025)) +
         theme(plot.title = element_text(hjust = 0.5))
     
+    filename = paste(method, "_class_performance.png", sep="")
     ggsave(filename, plot = last_plot(), path = "images",
            scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
 ## Plot overall performance
-plot_performance <- function(cm, positive, negative, filename){
+plot_performance <- function(cm, positive, negative, method){
     ## Accuracy
     acc = (cm[1] + cm[4]) / (cm[1] + cm[2] + cm[3] + cm[4])
     ## Macro score
@@ -123,12 +162,14 @@ plot_performance <- function(cm, positive, negative, filename){
         geom_col(colour="black", fill="blue", position="dodge") +
         scale_y_continuous(breaks=seq(0, 1, 0.025)) +
         theme(plot.title = element_text(hjust = 0.5))
+    
+    filename = paste(method, "_performance.png", sep="")
     ggsave(filename, plot = last_plot(), path = "images",
            scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
 ## Plot confusion matrix
-plot_cm <- function(cm, filename){
+plot_cm <- function(cm, method){
     cm = as.data.frame(cm)
     ggplot(data = cm,
            aes(x = factor(Reference, level = c('TRUE', 'FALSE')),
@@ -141,6 +182,7 @@ plot_cm <- function(cm, filename){
         xlab("Reference") + ylab("Prediction") + 
         theme(plot.title = element_text(hjust = 0.5))
     
+    filename = paste(method, "_cm.png", sep="")
     ggsave(filename, plot = last_plot(), path = "images",
            scale = 0.5, dpi = floor(DPI), limitsize = TRUE)
 }
