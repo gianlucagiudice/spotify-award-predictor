@@ -65,8 +65,12 @@ if (TRAIN_MODEL){
     training_report = train_svm_cv(df.out, folds)
 ### usando la generica funzione di cross validation:
 ### training_report = cross_validation_generic(df.out, train_svm, list(COST_LIST,GAMMA_LIST), folds, "SVM")
+    
+    #expand.grid(C = cost_list, sigma = gamma_list)
+    #method = "svmRadial"
+    #training_report = cross_validation(df.out, train_svm, list(COST_LIST,GAMMA_LIST), folds, "SVM")
     if (DUMP_MODEL){
-                                        # Save report
+        # Save report
         save(training_report, file="svmReport.RData")
     }
 }else{
