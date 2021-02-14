@@ -94,11 +94,6 @@ print(opt_cut)
 
 #  ==== Decision Tree ====
 
-
-### In R in generale é meglio non avere spazi dentro al nome di una colonna, rpart senza prima normalizzare i nomi di colonna non funziona
-### TODO questa operazione si potrebbe fare durante il preprocessing dei dati, tanto é veloce e non cambia niente per svm (penso)
-
-
 decision_tree.training_report = cross_validation_generic(dataframe = df.out,
                                                          training_function = train_decision_tree,
                                                          fold_indexes = folds,
