@@ -95,10 +95,10 @@ print(opt_cut)
 
 #  ==== Decision Tree ====
 
-decision_tree.training_report = cross_validation_generic(dataframe = df.out,
-                                                         training_function = train_decision_tree,
-                                                         fold_indexes = folds,
-                                                         technique_name_string = "Decision Tree")
+decision_tree.training_report = cross_validation(dataframe = df.out,
+                                                 method = "rpart",
+                                                 seed = SEED,
+                                                 n_folds = N_FOLDS)
 
 ### TODO tutte le analisi del caso
 
