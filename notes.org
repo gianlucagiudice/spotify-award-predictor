@@ -1,3 +1,9 @@
 Macro average perché tutte le class, istanze con award vinto o no sono ugualmente importanti.
 
 Durante il training del decision tree fatto da CART viene giá fatto un pruning dell'albero.
+
+paired t student nel nostro caso. per l'analisi di significativitá statistica.
+
+confronto roc auc per classe positiva e negativa.
+
+Fare il confronto tra timings.
