@@ -3,7 +3,15 @@
 ### Performs a k-cross validation (where k is the number of fold_indexes)
 ### The training_function first argument must be the training set, the rest of the arguments must be supplied in the training_function_args list
 
-cross_validation_generic <- function(dataframe, training_function, training_function_args = list(), fold_indexes, technique_name_string){
+
+# ------------- Constants --------------
+NUM_CORES <- detectCores()
+
+
+cross_validation <- function(dataframe, method, tune_grid, seed, n_folds, num_threads){
+    set.seed(seed)
+    fold_indexes = createFolds(df.out$award, k = N_FOLDS)
+
     performance.positive = c()
     performance.negative = c()
 
@@ -17,10 +25,16 @@ cross_validation_generic <- function(dataframe, training_function, training_func
             }
         }
 
-        print(paste("Training ", technique_name_string, " - fold ", i, "/", length(fold_indexes)))
+        print(paste("Training ", method, " - fold ", i, "/", length(fold_indexes)))
         ## trained_model = training_function(dataframe[train_idx,])
-        trained_model = do.call(training_function, append(list(dataframe[train_idx,]),
-                                                          training_function_args))
+        
+        #trained_model = do.call(training_function, append(list(dataframe[train_idx,]),
+        #                                                  training_function_args))
+
+        trained_model = train(award ~ ., data = df[train_idx,],
+                           method = method,
+                           tuneGrid = tune_grid,
+                           num.threads = num_threads)                                           
         ## Evaluate fold performance
         fold.positive_performance = list(evaluate_performance(
             trained_model, dataframe[test_idx, ], "TRUE"))
