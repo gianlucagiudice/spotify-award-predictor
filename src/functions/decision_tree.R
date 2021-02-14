@@ -1,3 +1,6 @@
+### OPTIMAL COMPLEXITY PARAMETER
+
+
 ### TRAINING 
 
 train_decision_tree <- function(training_data){
@@ -8,8 +11,9 @@ train_decision_tree <- function(training_data){
     return(trained_model)
 }
 
-### DECISION TREE SPECIFIC PLOTS
+### PRUNING
 
+### DECISION TREE SPECIFIC PLOTS
 
 train_svm <- function(training_data, cost_list, gamma_list) {
     svm.trained_cv = train(award ~ .,
