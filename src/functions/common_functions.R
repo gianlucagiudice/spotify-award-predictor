@@ -26,20 +26,19 @@ cross_validation <- function(dataframe, method, tune_grid, seed, n_folds, num_th
         }
 
         print(paste("Training ", method, " - fold ", i, "/", length(fold_indexes)))
-        ## trained_model = training_function(dataframe[train_idx,])
-        
-        #trained_model = do.call(training_function, append(list(dataframe[train_idx,]),
-        #                                                  training_function_args))
 
-        trained_model = train(award ~ ., data = df[train_idx,],
-                           method = method,
-                           tuneGrid = tune_grid,
-                           num.threads = num_threads)                                           
+        trained_model = train(award ~ .,
+                              data = df[train_idx,],
+                              method = method,
+                              tuneGrid = tune_grid,
+                              num.threads = num_threads)                                           
+
         ## Evaluate fold performance
         fold.positive_performance = list(evaluate_performance(
             trained_model, dataframe[test_idx, ], "TRUE"))
         fold.negative_performance = list(evaluate_performance(
             trained_model, dataframe[test_idx, ], "FALSE"))
+
         ## Append new performance
         performance.positive = c(performance.positive, fold.positive_performance)
         performance.negative = c(performance.negative, fold.negative_performance)
@@ -82,7 +81,7 @@ combine_folds_cm <- function(performance_folds){
 }
 
 ## Plot model performance
-plot_class_performance_generic <- function(positive, negative, filename){
+plot_class_performance <- function(positive, negative, filename){
     precision <- c(positive[1], negative[1])
     recall <- c(positive[2], negative[2])
     f1 <- c(positive[3], negative[3])
@@ -108,7 +107,7 @@ plot_class_performance_generic <- function(positive, negative, filename){
 }
 
 ## Plot overall performance
-plot_performance_generic <- function(cm, positive, negative, filename){
+plot_performance <- function(cm, positive, negative, filename){
     ## Accuracy
     acc = (cm[1] + cm[4]) / (cm[1] + cm[2] + cm[3] + cm[4])
     ## Macro score
@@ -135,7 +134,7 @@ plot_performance_generic <- function(cm, positive, negative, filename){
 }
 
 ## Plot confusion matrix
-plot_cm_generic <- function(cm, filename){
+plot_cm <- function(cm, filename){
     cm = as.data.frame(cm)
     ggplot(data = cm,
            aes(x = factor(Reference, level = c('TRUE', 'FALSE')),
