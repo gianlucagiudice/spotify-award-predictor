@@ -1,14 +1,8 @@
-### TODO forse la creazione dei fold puó essere spostata dal main a questa funzione, i fold singolarmente non vengono mai utilizzati tranne che in questa funzione.
-
-### Performs a k-cross validation (where k is the number of fold_indexes)
-### The training_function first argument must be the training set, the rest of the arguments must be supplied in the training_function_args list
-
-
-# ------------- Constants --------------
+### ------------- Constants --------------
 NUM_CORES <- detectCores()
 
 
-cross_validation <- function(dataframe, method, tune_grid, seed, n_folds, num_threads){
+cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds, num_threads = detectCores()){
     set.seed(seed)
     fold_indexes = createFolds(df.out$award, k = N_FOLDS)
 
