@@ -148,7 +148,7 @@ Di seguito viene descritto il dataset proveniente da kaggle, ovvero quello conte
 			Float\\
 			
 			key & 
-			Chiave musicale utilizzata &
+			Scala musicale utilizzata &
 			Factor \{0, 1, ..., 11\}\\
 			
 			mode & 
@@ -273,28 +273,28 @@ In questa sezione vengono analizzate e discusse le covariate del dataset. Dopo l
 
 Sotto viene riportata una tabella riassuntiva riguardo il numero di istanze nel dataset. Il significato dei threshold viene spiegato nella sezione successiva (\autoref{sec:assunzioni}).
 
-	\begin{table}[H]
-		
-		\begin{center}
-		
-		\begin{tabular}{ |l|c| }
-			\hline
-			\multicolumn{1}{ |c }{\textbf{DATASET}} &
-			\multicolumn{1}{ c |}{\textbf{\# ISTANZE}} \\
-			\hline
-			\hline
-			Dataset completo & 
-			$151762$\\
-			Dataset ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
-			$26134$\\
-			Dataset bilanciato ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
-			$3670$\\
-			\hline
-		\end{tabular}
-		
-	\end{center}
-		\caption{Numero di istanze nel dataset.}
-	\end{table}
+\begin{table}[H]
+	
+	\begin{center}
+	
+	\begin{tabular}{ |l|c| }
+		\hline
+		\multicolumn{1}{ |c }{\textbf{DATASET}} &
+		\multicolumn{1}{ c |}{\textbf{\# ISTANZE}} \\
+		\hline
+		\hline
+		Dataset completo & 
+		$151762$\\
+		Dataset ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
+		$26134$\\
+		Dataset bilanciato ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
+		$3670$\\
+		\hline
+	\end{tabular}
+	
+\end{center}
+	\caption{Numero di istanze nel dataset.}
+\end{table}
 		
 
 \subsection{Assunzioni sul dominio}
@@ -319,6 +319,7 @@ La distribuzione delle canzoni dal 2005 in poi è rappresentata in \autoref{fig:
  	\centering
  	\includegraphics[width=13cm]{../images/year_award_comparison.png}
  	\caption{Boxplot anno di rilascio, distinguendo tra le classi.}
+ 	\label{fig:year_boxplot_award}
  \end{figure}
  
 \subsubsection{Popolarità}
@@ -329,13 +330,13 @@ Il dataset forinto da Spotify contiene un campo "popularity". Tuttavia come spie
 
 Il campo "popularity" non verrà usato nella fase di training dei modelli, proprio perchè è un dato che non si conosce a priori nel momento in cui un singolo esce, ed è chiaramente influente nel determinare se una canzone vincerà o meno una certificazione e quindi se viene considerata di successo. 
 
-Infatti l'informazione sulla popolarità viene calcolata sul numero di streaming dopo un determinato lasso di temo. Stimare questo valore, dal momento che non è conosciuto fin da subito, è di fatto un problema di regressione ed è molto simile al task di classificazione preso in esame, pertanto il campo viene scartato.
+L'informazione sulla popolarità viene calcolata sul numero di streaming dopo un determinato lasso di temo. Stimare questo valore, dal momento che non è conosciuto fin da subito, è di fatto un problema di regressione ed è molto simile al task di classificazione preso in esame, pertanto il campo viene scartato.
 
-Anche se il campo non viene effettivamente utilizzato, è interessante analizzare la distribuzione dei valori di popolarità delle canzoni nel dataset. Inoltre assumiamo che per il problema trattato, si vogliono classificare delle canzoni che non sono completamente sconosciute. Sarebbe infatti irrealistico pensare che un singolo musicale del tutto sconosciuto vinca dal nulla una certificazione, risultando come brano di successo. 
+Anche se il campo non viene effettivamente utilizzato, è interessante analizzare la distribuzione dei valori di popolarità delle canzoni nel dataset. Inoltre assumiamo che per il problema trattato, si vogliono classificare delle canzoni che non sono completamente sconosciute. Sarebbe infatti irrealistico pensare che un singolo musicale del tutto sconosciuto vinca dal nulla una certificazione, risultando come brano di successo.  Per questo motivo non si tratta di una assunzione molto restrittiva.
 
 Si assume di voler utilizzare questi modelli per classificare brani che iniziano ad essere un minimo conosciuti o hanno almeno il potenziale di diventare popolari. Si noti come un brano di poco popolare non implica assolutamente che questo vinca un disco d'oro o di platino.
 
-Viene quindi qui sotto analizzata da distribuzione della popolarità delle canzoni nel dataset.
+Di seguito viene analizzata da distribuzione della popolarità delle canzoni nel dataset.
 
 
 \begin{figure}[H]
@@ -372,6 +373,8 @@ Dalla \autoref{fig:award_distribution} emerge che il dataset è sbilanciato, il 
 
 \subsection{Preprocessing}
 Per quanto riguarda le variabili numeriche queste vengono standardizzare, ovvero per ogni covariata si trasformano gli individui in modo da ottenere dei valori tali che $\mu = 0;\; \sigma = 1$. Questa è sicuramente una best practice ma è cruciale per quanto riguarda la PCA, tecinca che viene utilizzata e spiegata in \autoref{sec:pca}.
+
+Inoltre nella fase di preprocessing tutti gli artisti vengono trasformati in lowercase. Questo è necessario nel momento in cui si vuole tenere traccia degli artisti nelle canzoni con una rappreszentazione one hot encoding (\autoref{sec:one}).
 
 \subsection{Distribuzione dei valori}
 \subsubsection{Variabili numeriche}
@@ -432,7 +435,7 @@ Vine ora considareato il numero di occorrenze di ogni artista tra tutte le canzo
 	\caption{Frequenza delle occorenze degli artisti nelle canzoni.}
 \end{figure}
 
-Come possiamo notare da questo grafico, la maggior parte degli artisti hanno fatto solo una canzone. Questo aspetto verrà tenuto in considerazione per la rappresentazione BOW degli artisti, come spiegato in \autoref{sec:bow}
+Come possiamo notare da questo grafico, la maggior parte degli artisti hanno fatto solo una canzone. Questo aspetto verrà tenuto in considerazione per la rappresentazione one hot encoding degli artisti, come spiegato in \autoref{sec:one}
 
 \subsubsection{Wordcloud}
 Si vuole ora anlizzare se esiste una differenza tra artisti che hanno realizzato brani di successo rispetto a quelli non di successo. Viene prima di tutto mostrato il wordcloud degli artisti tra tutte le canzoni, senza fare distinzione tra classe positiva e negativa.
@@ -459,7 +462,7 @@ Analogamente il worcloud degli artisti considerando solo le canzoni non di succe
 	\caption{Wordcloud artisti considerando solo la classe negativo.}
 \end{figure}
 
-Dai grafici emerge che molti artisti compaiono sia nella classe positiva che in quella negativa. Tuttavia ci sono alcuni artisti e.g. "Taylor Swift" o "Rihanna" che spiccano nella classe di successo mentre sono meno frequenti nei brani non di successo. A fronte di questa analisi riteniamo che considerare gli artisti all'interno di un brano possa essere utile per distinguere le due classi. Viene quindi utilizzata una rappresentazione BOW (spiegato in \autoref{sec:bow}) per utilizzare questa informazione durante la fase di training dei modelli.
+Dai grafici emerge che molti artisti compaiono sia nella classe positiva che in quella negativa. Tuttavia ci sono alcuni artisti e.g. "Taylor Swift" o "Rihanna" che spiccano nella classe di successo mentre sono meno frequenti nei brani non di successo. A fronte di questa analisi riteniamo che considerare gli artisti all'interno di un brano possa essere utile per distinguere le due classi. Viene quindi utilizzata una rappresentazione one hot encoding (spiegato in \autoref{sec:one}) per utilizzare questa informazione durante la fase di training dei modelli.
 
 
 \subsection{Correlazione tra features}
@@ -522,50 +525,70 @@ In questa sezione viene spigata e giustificata la scelta di ogni feature.
 Come si può notare dalla \autoref{tab:features} non tutti le features vengono utilizzate. Le variabili scartate sono le seguenti:
 
 \begin{itemize}
-	\item \textbf{id}:
-	\item \textbf{name}:
-	\item \textbf{year}:
-	\item \textbf{release\_data}:
-	\item \textbf{popularity}:
+	\item \textbf{id}: ID assegnato da spotify a ogni brano musicale. Questo campo non è rilevante per distinguere le due classi
+	\item \textbf{name}: Titolo del brano musicale. Questa variabile non è utilizzata. Si potrebbero usare tecniche di NLP per tenere conto del sentiment del titolo brano e usare questa feature aggiuntiva.
+	\item \textbf{release\_data}: 
+	L'anno di rilascio del brano viene utilizzato solo per la fase iniziale per scartare i brani troppo vecchi. Questa covariata non viene utilizzata per il training in quanto si ritiene che non sia influente per distinguere le due classi (\autoref{fig:year_boxplot_award}). Inoltre si vogliono costruire modelli che siano indipendenti dalla data di rilascio.
+	\item \textbf{year}: Campo uguale a "release\_date". Nel dataset questa informazione è duplicata. 
+	\item \textbf{popularity}: Questo campo non viene utilizzato per i motivi discussi in \autoref{sec:popularity}
 \end{itemize}
 
-Vengono qui spiegate le features utilizzate
-\subsection{Rappresentazione BOW degli artisti}
-\label{sec:bow}
-Artisti in lowercase e rappresentazione bow
 
-Uso del threshold
+\subsection{Rappresentazione one hot encoding degli artisti}
+\label{sec:one}
+Dopo aver analizzato i wordcloud degli artisti emerge che questa informazione è utile per distinguere le due classi. Si procede quindi costruendo l'insieme degli artisti tra tutte le canzoni. Per ogni artista viene tenuto traccia del numero di brani musicali in cui l'artista compare.
 
-\subsubsection{Threshold freqeunza}
-Viene usato un threshold a 2 per non avere delle canzoni con artisti completamente sconosciuti. Assumiamo quindi di fare previsioni su canzoni cantante da artisti un minimo conosciuti.
+La frequenza è necessaria perchè si vogliono tenere solo gli artisti che hanno una frequenza maggiore o uguale a $2$. Questa operazione viene effetuata per non contare gli artisti completamente sconosciuti, in quanto si ritengono non influenti ai fine della classificazione. 
+Inoltre a causa dell'undersampling è possibile avere diverse canzoni cantate da artisti "sconosciuti" e non avendo scelto una particolare strategia per l'undersampling adottiamo a questo punto l'utilizzo di un threshold.
 
-Questa assunzione non è molto restrittiva, ci immaginiamo infatti che per vincere un premio una canzone deve essere cantata da artisti non completamente sconosciuti
+Si procede quindi costruendo una matrice dove le colonne rappresentano ogni artista nell'insieme degli artisti, le righe invece gli individui nel dataset. L'entrata $i,\; j$ della matrice può contenere il valore $1$ o $0$. Nel caso in cui il $j$-esimo artista ha cantanto nella $i$-esima canzone allora l'entrata della matrice ha il valore $1$, $0$ altrimenti.
 
-Inoltre a causa dell'undersampling è possibile avere diverse canzoni cantate da artisti "sconosciuti" e non avendo scelto una particolare strategia per l'undersampling adottiamo a questo punto l'utilizzo di un threshold
+La matrice costruita costituisce la rappresentazione degli artisti nelle canzoni.
 
 \subsection{Variabili categoriche}
-\subsubsection{Key - Trasformazione a intero}
-Vengono trasformate su range 0 1, codificate in intero ecc...
+Tutte le variabile categoriche vengono utilizzate ai fini della classificazione in quanto dalla descrizione della \autoref{tab:features} risultano essere importanti nella distinzione delle classi.
+
+\subsubsection{Variabile key}
+La variabile key è di tipo factor i cui valori sono numeri da 1 a 11. Questa covariata indica la scala musicale utilizzata nella canzone. Dal momento che esiste una relazione d'ordine totale tra le note musicali, infatti si parla di scala musicale, per questa variabile viene effettuata l'operazione di cast a intero. Come secondo passo i valori vengono scalati in modo tale da essere compresi tra $0$ e $1$.
+
+\subsubsection{Variabile mode}
+La variabile mode è binaria, viene utilizzata impostando a $1$ se vero $0$ altrimenti.
+\subsubsection{Variabile explicit}
+Per la variabile explicit si procede analogamento a come fatto per la covariata mode.
 
 \subsection{Coordinate PCA}
-Dataset proiettato componenti principali
 
-\subsection{Normalizzazione e standardizzazione}
-Conversione in lowecase
-Converto in variabili numeriche e factor + label corretta
-
-\subsection{Dataset proiettato componenti principali}
+Le variabili numeriche non vengono direttamente usate per il training, piuttosto si utilizza il nuovo spazio ottenuto dalla PCA. Questo nuovo spazio ha dimensione inferiore rispetto al numero di variabili numeriche iniziale, ed è stato costruito proiettando gli individui del dataset di partenza nel nuovo spazio che ha come basi le $7$ componenti principali.
 
 \subsection{Riassunto feature finali utilizzate}
 
-Numero delle istanze
 
-
-151762
-
-26134
-
-3670
-
-
-Tabella
+\begin{table}[H]
+	
+	\begin{center}
+		
+		\begin{tabular}{ |l|c| }
+			\hline
+			\multicolumn{1}{ |c }{\textbf{FEATURE}} &
+			\multicolumn{1}{ c |}{\textbf{\# COVARIATE}} \\
+			\hline
+			\hline
+			One-hot-encoding artisti & 
+			$655$\\
+			Componenti principali & 
+			$7$\\
+			Variabili categoriche & 
+			$3$\\
+			Label & 
+			$1$\\
+			\hline
+			
+			\multicolumn{1}{ c }{ } &
+			\multicolumn{1}{ | c |}{666} \\
+			\cline{2-2}
+			
+		\end{tabular}
+		
+	\end{center}
+	\caption{Tabella riassuntiva features utilizzate.}
+\end{table}
