@@ -61,6 +61,7 @@ print(paste("Dimension of the dataset for training (rows x columns):",
 # Reduced dataframe for tests purpose
 df.reduced = subset(df.out, select = c(661, 662, 666))
 df.reduced = union_all(df.reduced[1:25,], df.reduced[2500:2525,])
+colnames(df.reduced) <- make.names(colnames(df.reduced))
 ## ----------- DA RIMUOVERE -----------
 
 
@@ -80,10 +81,31 @@ train_target_model(dataframe = df.reduced,
 
 #  ==== Decision Tree ====
 method = "rpart"
+control = trainControl(classProbs = TRUE)
 training_report.decision_tree = cross_validation(dataframe = df.out,
                                                  method = method,
                                                  seed = SEED,
                                                  n_folds = N_FOLDS)
+
+training_report.decision_tree = cross_validation(dataframe = df.out,
+                                                 method = method,
+                                                 tr_control = control,
+                                                 seed = SEED,
+                                                 n_folds = N_FOLDS)
+
+training_report.decision_tree = train_target_model(dataframe = df.out,
+                                                   method = method,
+                                                   seed = SEED,
+                                                   n_folds = N_FOLDS,
+                                                   num_cores = 4)
+
+training_report.decision_tree = train_target_model(dataframe = df.reduced,
+                                                   method = method,
+                                                   seed = SEED,
+                                                   n_folds = N_FOLDS,
+                                                   num_cores = 4)
+
+
 
 ### TODO tutte le analisi del caso
 decision_tree.performance.positive_folds = training_report.decision_tree[[1]]
