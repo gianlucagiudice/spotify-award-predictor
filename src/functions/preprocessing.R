@@ -153,7 +153,7 @@ build_balanced_dataset <- function(data, seed) {
 build_dataframe <- function(balanced) {
     # Keep only numeric features
     df = balanced
-    df.numeric = subset(df, select=c(3, 5:8, 10, 12, 13, 15:16))
+    df.numeric = subset(df, select=c(3, 5:8, 10, 12, 13, 15:17))
     df.award = df$award
     df.categorical = subset(df, select=c(9, 11, 14))
     # Standardize
@@ -180,7 +180,9 @@ build_dataframe <- function(balanced) {
     ggsave("correlation.png", plot = last_plot(), path = "images",
            scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
     
-    to_return = list(df, df.numeric, df.categorical, df.award)
+    # Remove popularity feature for trainig purpose
+    df.numeric_used = subset(df, select=c(3, 5:8, 10, 12, 13, 15:16))
+    to_return = list(df, df.numeric_used, df.categorical, df.award)
     return(to_return)
 }
 
