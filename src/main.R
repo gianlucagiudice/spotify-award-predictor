@@ -60,7 +60,7 @@ print(paste("Dimension of the dataset for training (rows x columns):",
 ## ----------- DA RIMUOVERE -----------
 # Reduced dataframe for tests purpose
 df.reduced = subset(df.out, select = c(661, 662, 666))
-df.reduced = union_all(df.reduced[1:25,], df.reduced[2500:2525,])
+df.reduced = union_all(df.reduced[1:100,], df.reduced[2500:2600,])
 colnames(df.reduced) <- make.names(colnames(df.reduced))
 ## ----------- DA RIMUOVERE -----------
 
