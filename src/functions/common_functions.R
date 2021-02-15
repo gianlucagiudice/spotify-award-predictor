@@ -79,7 +79,7 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = N
                               trControl = tr_control)
         
         ## Save predictions for each fold
-        pred = predict(trained_model, dataframe[test_idx, ], probability = TRUE)
+        pred = predict(trained_model, dataframe[test_idx, ], type = "prob")
         attributes(pred)
         str(pred)
         predictions <- c(predictions, list(pred))

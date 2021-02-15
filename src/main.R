@@ -26,9 +26,7 @@ NUM_CORES = detectCores(logical = TRUE) # Number of cores
 
 # ------------ Preprocessing ------------
 # Read the dataset 
-data = read_dataset("data/songs.csv",
-                    positive_class_name = POSITIVE_CLASS_NAME,
-                    negative_class_name = NEGATIVE_CLASS_NAME)
+data = read_dataset("data/songs.csv")
 print(head(data))
 # Plot data
 data_visualization(data, POPULARITY_THLD, YEAR_THLD)

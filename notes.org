@@ -9,3 +9,5 @@ confronto roc auc per classe positiva e negativa.
 Fare il confronto tra timings.
 
 per predictions 1 = false, 2 = true
+
+prediction (predictions, dataframe$award)
