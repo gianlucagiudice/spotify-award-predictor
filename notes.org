@@ -7,3 +7,5 @@ paired t student nel nostro caso. per l'analisi di significativitá statistica.
 confronto roc auc per classe positiva e negativa.
 
 Fare il confronto tra timings.
+
+per predictions 1 = false, 2 = true
