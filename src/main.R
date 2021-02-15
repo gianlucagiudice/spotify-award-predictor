@@ -11,6 +11,9 @@ source('src/functions/decision_tree.R')
 DPI <- 300
 SCALE = 0.75
 
+POSITIVE_CLASS_NAME = "award"
+NEGATIVE_CLASS_NAME = "not_award"
+
 TERM_FREQUENCY_THLD <- 2 # Term frequency
 YEAR_THLD <- 2005
 POPULARITY_THLD <- 25
@@ -23,7 +26,9 @@ NUM_CORES = detectCores(logical = TRUE) # Number of cores
 
 # ------------ Preprocessing ------------
 # Read the dataset 
-data = read_dataset("data/songs.csv")
+data = read_dataset("data/songs.csv",
+                    positive_class_name = POSITIVE_CLASS_NAME,
+                    negative_class_name = NEGATIVE_CLASS_NAME)
 print(head(data))
 # Plot data
 data_visualization(data, POPULARITY_THLD, YEAR_THLD)
@@ -80,18 +85,16 @@ train_target_model(dataframe = df.reduced,
                    num_cores = NUM_CORES)
 
 #  ==== Decision Tree ====
+
 method = "rpart"
 control = trainControl(classProbs = TRUE)
-training_report.decision_tree = cross_validation(dataframe = df.out,
-                                                 method = method,
-                                                 seed = SEED,
-                                                 n_folds = N_FOLDS)
 
 training_report.decision_tree = cross_validation(dataframe = df.out,
                                                  method = method,
-                                                 tr_control = control,
                                                  seed = SEED,
+                                                 tr_control = control,
                                                  n_folds = N_FOLDS)
+
 
 training_report.decision_tree = train_target_model(dataframe = df.out,
                                                    method = method,

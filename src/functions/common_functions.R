@@ -16,7 +16,7 @@ train_target_model <- function(dataframe, method, tune_grid = NULL, tr_control =
                                            method = method,
                                            seed = seed,
                                            tune_grid = tune_grid,
-                                           tr_control = tr_control
+                                           tr_control = tr_control,
                                            n_folds = n_folds)
         if (DUMP_MODEL){
             ## Save report
@@ -88,10 +88,10 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = N
         ## Evaluate fold performance
         fold.positive_performance = list(evaluate_performance(trained_model,
                                                               dataframe[test_idx, ],
-                                                              "TRUE"))
+                                                              POSITIVE_CLASS_NAME))
         fold.negative_performance = list(evaluate_performance(trained_model,
                                                               dataframe[test_idx, ],
-                                                              "FALSE"))
+                                                              NEGATIVE_CLASS_NAME))
 
         ## Append new performance
         performance.positive = c(performance.positive, fold.positive_performance)

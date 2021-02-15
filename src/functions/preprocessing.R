@@ -27,7 +27,10 @@ read_dataset <- function(path) {
     data$key <- factor(data$key)
     data$explicit <- factor(data$explicit)
     data$mode <- factor(data$mode)
+    # Label
     data$award <- factor(!data$award == "null")
+    data$award <- recode_factor(
+      data$award, "TRUE" = POSITIVE_CLASS_NAME, "FALSE" = NEGATIVE_CLASS_NAME)
     # Convert to lowercase
     data$name = to_lower(data$name)
     data$artists = to_lower(data$artists)
@@ -138,8 +141,8 @@ data_visualization <- function(data_all, popularity_thld, year_yhld) {
 # Build a balanced dataset
 build_balanced_dataset <- function(data, seed) {
     set.seed(seed)
-    positive <- subset(data, award == TRUE)
-    negative <- subset(data, award == FALSE)
+    positive <- subset(data, award == POSITIVE_CLASS_NAME)
+    negative <- subset(data, award == NEGATIVE_CLASS_NAME)
     negative_sample <- negative[sample(nrow(negative), nrow(positive)), ]
     data_balanced = union(positive, negative_sample)
 
@@ -160,8 +163,10 @@ build_dataframe <- function(balanced) {
     df.sample = df.numeric
     df.sample$award = df.award
     df.sample <- union_all(
-      sample_n(subset(df.sample, award == TRUE), SAMPLE_SIZE / 2, seed=SEED),
-      sample_n(subset(df.sample, award == FALSE), SAMPLE_SIZE / 2, seed=SEED))
+      sample_n(subset(df.sample, award == POSITIVE_CLASS_NAME),
+               SAMPLE_SIZE / 2, seed=SEED),
+      sample_n(subset(df.sample, award == NEGATIVE_CLASS_NAME),
+               SAMPLE_SIZE / 2, seed=SEED))
     # Pair plot
     pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.15))
     #pairplot
@@ -293,7 +298,7 @@ build_term_frequency_matrix <- function(df) {
     
     # Wordcloud award
     artists.tf_positive = subset(artists.tf,
-                                 artists.tf$award == "TRUE")
+                                 artists.tf$award == POSITIVE_CLASS_NAME)
     artists.occurrence_positive = data.frame(
       occurrence = colSums(artists.tf_positive[-1]))
     
@@ -305,7 +310,7 @@ build_term_frequency_matrix <- function(df) {
     
     # Wordcloud not award
     artists.tf_negative = subset(artists.tf,
-                                 artists.tf$award == "FALSE")
+                                 artists.tf$award == NEGATIVE_CLASS_NAME)
     artists.occurrence_negative = data.frame(
       occurrence = colSums(artists.tf_negative[-1]))
     
