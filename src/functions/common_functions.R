@@ -53,7 +53,7 @@ train_target_model <- function(dataframe, method, tune_grid = NULL, tr_control =
 
 cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = NULL, seed, n_folds){
     set.seed(seed)
-    fold_indexes = createFolds(dataframe$award, k = N_FOLDS)
+    fold_indexes = createFolds(dataframe$award, k = n_folds)
 
     performance.positive = c()
     performance.negative = c()
