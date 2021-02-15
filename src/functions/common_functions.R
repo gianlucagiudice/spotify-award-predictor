@@ -1,50 +1,49 @@
 ### ------------- Constants --------------
 NUM_CORES <- detectCores()
 
-train_target_model <- function(dataframe, method, tune_grid = NULL,
+train_target_model <- function(dataframe, method, tune_grid = NULL, tr_control = NULL,
                                seed, n_folds, train_model = TRUE,
                                dump_model = TRUE, num_cores = 1){
     
-    # Start cluster
+    ## Start cluster
     cl <- makePSOCKcluster(num_cores)
     registerDoParallel(cl)
     
-    # Train model
+    ## Train model
     filename = paste(method, "_report.RData", sep="")
     if (TRAIN_MODEL){
         training_report = cross_validation(dataframe = dataframe,
-                                               method = method,
-                                               seed = seed,
-                                               tune_grid = tune_grid,
-                                               n_folds = n_folds)
+                                           method = method,
+                                           seed = seed,
+                                           tune_grid = tune_grid,
+                                           tr_control = tr_control
+                                           n_folds = n_folds)
         if (DUMP_MODEL){
-            # Save report
+            ## Save report
             save(training_report, file=filename)
         }
     }else{
         load(filename)
     }
     
-    # Stop cluster
+    ## Stop cluster
     stopCluster(cl)
     
-    # Performance
+    ## Performance
     performance.positive_folds = training_report[[1]]
     performance.negative_folds = training_report[[2]]
-    # Class performance
+    ## Class performance
     performance.positive = combine_folds_performance(performance.positive_folds)
     performance.negative = combine_folds_performance(performance.negative_folds)
-    plot_class_performance(
-        performance.positive[5:7],
-        performance.negative[5:7],
-        method)
-    # Confusion matrix
+    plot_class_performance(performance.positive[5:7],
+                           performance.negative[5:7],
+                           method)
+    ## Confusion matrix
     confusion_matrix = combine_folds_cm(performance.positive_folds)
-    plot_performance(
-        confusion_matrix,
-        performance.positive,
-        performance.negative,
-        method)
+    plot_performance(confusion_matrix,
+                     performance.positive,
+                     performance.negative,
+                     method)
     plot_cm(confusion_matrix, method)
     # AUC
     #opt_cut = plot_auc(dataframe, 'radial')
@@ -52,13 +51,15 @@ train_target_model <- function(dataframe, method, tune_grid = NULL,
     #print(opt_cut)
 }
 
-cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds){
+cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = NULL, seed, n_folds){
     set.seed(seed)
     fold_indexes = createFolds(dataframe$award, k = N_FOLDS)
 
     performance.positive = c()
     performance.negative = c()
 
+    predictions = c()
+    
     for (i in 1:length(fold_indexes)){
         ## Build training and test sets
         test_idx = fold_indexes[[i]]
@@ -74,20 +75,30 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds)
         trained_model = train(award ~ .,
                               data = dataframe[train_idx,],
                               method = method,
-                              tuneGrid = tune_grid)                                           
-
+                              tuneGrid = tune_grid,
+                              trControl = tr_control)
+        
+        ## Save predictions for each fold
+        pred = predict(trained_model, dataframe[test_idx, ], probability = TRUE)
+        attributes(pred)
+        str(pred)
+        predictions <- c(predictions, list(pred))
+        str(predictions)
+        
         ## Evaluate fold performance
-        fold.positive_performance = list(evaluate_performance(
-            trained_model, dataframe[test_idx, ], "TRUE"))
-        fold.negative_performance = list(evaluate_performance(
-            trained_model, dataframe[test_idx, ], "FALSE"))
+        fold.positive_performance = list(evaluate_performance(trained_model,
+                                                              dataframe[test_idx, ],
+                                                              "TRUE"))
+        fold.negative_performance = list(evaluate_performance(trained_model,
+                                                              dataframe[test_idx, ],
+                                                              "FALSE"))
 
         ## Append new performance
         performance.positive = c(performance.positive, fold.positive_performance)
         performance.negative = c(performance.negative, fold.negative_performance)
     }
 
-    return(list(performance.positive, performance.negative))
+    return(list(performance.positive, performance.negative, predictions))
 }
 
 ### Evaluate model performance
