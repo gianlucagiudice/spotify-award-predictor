@@ -87,11 +87,17 @@ train_target_model(dataframe = df.reduced,
 method = "rpart"
 control = trainControl(classProbs = TRUE)
 
-training_report.decision_tree = cross_validation(dataframe = df.out,
+training_report.decision_tree = cross_validation(dataframe = df.reduced,
                                                  method = method,
                                                  seed = SEED,
                                                  tr_control = control,
                                                  n_folds = N_FOLDS)
+
+# 1 = FALSE (not_award) 2 = TRUE (award)
+
+probs = training_report.decision_tree[[3]]
+references = training_report.decision_tree[[4]]
+
 
 
 training_report.decision_tree = train_target_model(dataframe = df.out,

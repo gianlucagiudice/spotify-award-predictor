@@ -45,6 +45,7 @@ train_target_model <- function(dataframe, method, tune_grid = NULL, tr_control =
                      performance.negative,
                      method)
     plot_cm(confusion_matrix, method)
+    
     # AUC
     #opt_cut = plot_auc(dataframe, 'radial')
     #print("Optimal cutoff:")
@@ -59,6 +60,7 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = N
     performance.negative = c()
 
     predictions = c()
+    references = c()
     
     for (i in 1:length(fold_indexes)){
         ## Build training and test sets
@@ -80,10 +82,9 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = N
         
         ## Save predictions for each fold
         pred = predict(trained_model, dataframe[test_idx, ], type = "prob")
-        attributes(pred)
-        str(pred)
+        
         predictions <- c(predictions, list(pred))
-        str(predictions)
+        references <- c(references, dataframe[test_idx, "award"])
         
         ## Evaluate fold performance
         fold.positive_performance = list(evaluate_performance(trained_model,
@@ -98,7 +99,7 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = N
         performance.negative = c(performance.negative, fold.negative_performance)
     }
 
-    return(list(performance.positive, performance.negative, predictions))
+    return(list(performance.positive, performance.negative, predictions, references))
 }
 
 ### Evaluate model performance
