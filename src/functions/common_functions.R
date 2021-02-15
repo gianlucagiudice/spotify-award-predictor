@@ -209,3 +209,31 @@ plot_cm <- function(cm, method){
     ggsave(filename, plot = last_plot(), path = "images",
            scale = 0.5, dpi = floor(DPI), limitsize = TRUE)
 }
+
+funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color) {
+    ## Split train test set
+    set.seed(SEED)
+    ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
+    trainset <- dataframe[ind == 1,]
+    testset <- dataframe[ind == 2,]
+
+    control <- trainControl(method = "repeatedcv", number = n_folds,repeats = repeats,
+                            classProbs = TRUE, summaryFunction = twoClassSummary)
+    
+    trained_model <- train(award ~ .,
+                           data = trainset,
+                           method = method,
+                           metric = "ROC",
+                           trControl = control)
+
+    trained_model.probs <- predict(trained_model, testset, type = "prob")
+
+    trained_model.ROC <- roc(response = testset [,c("award")],
+                             predictor = trained_model.probs[, class],
+                             levels = levels(testset[,c("award")]))
+
+    plot(trained_model.ROC, type = "S", col= line_color)
+
+    return(trained_model)
+
+}
