@@ -95,3 +95,6 @@ train_target_model(dataframe = dataframe,
 
 ### ------- Model comparison -------
 ### TODO 
+
+decision_tree <- funzione_roc(df.out, "rpart", "award", 2, 1, "green")
+svm <- funzione_roc(df.out, "svmRadial", 2, 1, "red")
