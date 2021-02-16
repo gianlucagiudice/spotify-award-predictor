@@ -1,13 +1,14 @@
-# ------- Load custom functions -------
+### ------- Load custom functions -------
 INSTALL_LIBRARIES = FALSE
 DUMP_MODEL = FALSE
 TRAIN_MODEL = TRUE
+PLOT_GRAPHS = FALSE
 source('src/functions/preprocessing.R')
 source('src/functions/training_svm.R')
 source('src/functions/common_functions.R')
 source('src/functions/decision_tree.R')
 
-# ------------- Constants --------------
+### ------------- Constants --------------
 DPI <- 300
 SCALE = 0.75
 
@@ -24,38 +25,40 @@ N_FOLDS = 10 # Cross validation parameter
 NUM_CORES = detectCores(logical = TRUE) # Number of cores
 
 
-# ------------ Preprocessing ------------
-# Read the dataset 
+### ------------ Preprocessing ------------
+## Read the dataset 
 data = read_dataset("data/songs.csv")
 print(head(data))
-# Plot data
+## Plot data
 data_visualization(data, POPULARITY_THLD, YEAR_THLD)
-# Songs after 2005 and minimum popularity
+## Songs after 2005 and minimum popularity
 data <- subset(data, year >= YEAR_THLD & popularity > POPULARITY_THLD)
-# Build a balanced dataset
+## Build a balanced dataset
 data.balanced <- build_balanced_dataset(data, SEED)
 
-# Feature visualization
-df = build_dataframe(data.balanced)
+## Feature visualization
+df = build_dataframe(data.balanced, PLOT_GRAPHS)
 df.numeric = df[[2]]
 df.categorical = df[[3]]
 df.award = df[[4]]
 df = df[[1]]
 
-# Principal components analysis
-df.principal_components = perform_pca(df.numeric, NPC)
+## Principal components analysis
+df.principal_components = perform_pca(df.numeric, NPC, PLOT_GRAPHS)
 print(head(df.principal_components))
 
-# Plot categorical feature
+## Plot categorical feature
 plot_categorical_feature(df)
 
-# Bag of words representation for artists
-artists.tf_thld <- build_term_frequency_matrix(df)
+## Bag of words representation for artists
+artists.tf_thld <- build_term_frequency_matrix(df, PLOT_GRAPHS)
 
-# Build dataframe for training
-df.out = build_out_dataframe(
-  artists.tf_thld, df.principal_components, df.categorical, df.award)
-# Out dataframe
+## Build dataframe for training
+df.out = build_out_dataframe(artists.tf_thld,
+                             df.principal_components,
+                             df.categorical,
+                             df.award)
+## Out dataframe
 print(paste("Dimension of the dataset for training (rows x columns):",
             dim(df.out)[1], dim(df.out)[2]))
 
@@ -69,8 +72,8 @@ dataframe = df.reduced
 ## ----------- DA RIMUOVERE -----------
 
 
-# ------------ Training ------------
-# ==== SVM ====
+### ------------ Training ------------
+### ==== SVM ====
 method = "svmRadial"
 tune_grid = expand.grid(C = COST_LIST, sigma = GAMMA_LIST)
 train_target_model(dataframe = dataframe,
@@ -80,14 +83,13 @@ train_target_model(dataframe = dataframe,
                    n_folds = N_FOLDS,
                    num_cores = NUM_CORES)
 
-#  ==== SVM LINEAR ====
-# Inserire qui
+###  ==== SVM LINEAR ====
+### Inserire qui
 
-#  ==== DECISION TREE ====
-method = "rpart"
+###  ==== DECISION TREE ====
 tune_grid = expand.grid(cp = COMPLEXITY_LIST)
-train_target_model(dataframe = dataframe,
-                   method = method,
+train_target_model(dataframe = df.out,
+                   method = "rpart",
                    seed = SEED,
                    n_folds = N_FOLDS,
                    num_cores = NUM_CORES)
@@ -96,5 +98,5 @@ train_target_model(dataframe = dataframe,
 ### ------- Model comparison -------
 ### TODO 
 
-decision_tree <- funzione_roc(df.out, "rpart", "award", 2, 1, "green")
+decision_tree <- funzione_roc(df.out, "rpart", "award", 2, 1, "darkgreen")
 svm <- funzione_roc(df.out, "svmRadial", 2, 1, "red")

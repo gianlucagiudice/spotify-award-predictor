@@ -149,92 +149,105 @@ build_balanced_dataset <- function(data, seed) {
     return(data_balanced)
 }
 
-# Build dataframe
-build_dataframe <- function(balanced) {
-    # Keep only numeric features
+### Build dataframe
+build_dataframe <- function(balanced, plot_graph) {
+    ## Keep only numeric features
     df = balanced
     df.numeric = subset(df, select=c(3, 5:8, 10, 12, 13, 15:17))
     df.award = df$award
     df.categorical = subset(df, select=c(9, 11, 14))
-    # Standardize
+    ## Standardize
     df.numeric = as.data.frame(scale(df.numeric, center = TRUE, scale = TRUE))
-    # Sample 500 random points for plot purpose
-    SAMPLE_SIZE = 500
-    df.sample = df.numeric
-    df.sample$award = df.award
-    df.sample <- union_all(
-      sample_n(subset(df.sample, award == POSITIVE_CLASS_NAME),
-               SAMPLE_SIZE / 2, seed=SEED),
-      sample_n(subset(df.sample, award == NEGATIVE_CLASS_NAME),
-               SAMPLE_SIZE / 2, seed=SEED))
-    # Pair plot
-    pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.15))
-    #pairplot
-    ggsave("pairplot.png", plot = pairplot, path = "images",
-           scale = SCALE * 1.5, dpi = DPI, 
-           height=29, width=40, units="cm",
-           limitsize = FALSE)
-    # Correlation plot
-    corr <- cor(df.numeric)
-    ggcorrplot(corr)
-    ggsave("correlation.png", plot = last_plot(), path = "images",
-           scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+    ## Sample 500 random points for plot purpose
+    if (plot_graph) {
+        SAMPLE_SIZE = 500
+        df.sample = df.numeric
+        df.sample$award = df.award
+        df.sample <- union_all(
+            sample_n(subset(df.sample, award == POSITIVE_CLASS_NAME),
+                     SAMPLE_SIZE / 2, seed=SEED),
+            sample_n(subset(df.sample, award == NEGATIVE_CLASS_NAME),
+                     SAMPLE_SIZE / 2, seed=SEED))
+
+        ## Pair plot
+        pairplot = ggpairs(df.sample, aes(colour = award, alpha = 0.15))
+
+        ggsave("pairplot.png", plot = pairplot, path = "images",
+               scale = SCALE * 1.5, dpi = DPI, 
+               height=29, width=40, units="cm",
+               limitsize = FALSE)
+
+        ## Correlation plot
+        corr <- cor(df.numeric)
+        ggcorrplot(corr)
+        ggsave("correlation.png", plot = last_plot(), path = "images",
+               scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+    }
     
-    # Remove popularity feature for trainig purpose
+    
+    ## Remove popularity feature for trainig purpose
     df.numeric_used = subset(df, select=c(3, 5:8, 10, 12, 13, 15:16))
     to_return = list(df, df.numeric_used, df.categorical, df.award)
     return(to_return)
 }
 
-# Principal component analysis
-perform_pca <- function(active, ncp) {
-    pca = PCA(active, scale.unit = TRUE, ncp = ncp)
+### Principal component analysis
+perform_pca <- function(active, ncp, plot_graph) {
+    pca = PCA(active, scale.unit = TRUE, ncp = ncp, graph = plot_graph)
     print("PCA results:")
     print(pca$eig)
     
-    # Pca explained variance plot
-    pca_df = as.data.frame.matrix(pca$eig)
-    pca_df$id = 1:nrow(pca_df)
-    ggplot(data = pca_df) +
-      ggtitle("Explained variance + cumulative variance") +
-      xlab("Principal component") + ylab("Explained variance") +
-      geom_col(aes(x = id, y = pca_df[,2]), color = "black", fill = "white") +
-      geom_line(aes(x = id, y = pca_df[,3]), color="red") +
-      geom_point(aes(x = id, y = pca_df[,3]), color="red") +
-      scale_y_continuous(breaks = seq(0, 100, by = 5)) +
-      scale_x_continuous(breaks = seq(0, nrow(pca_df), by = 1)) +
-      theme(plot.title = element_text(hjust = 0.5))
-    ggsave("pca_variance_explained.png", plot = last_plot(), path = "images",
-           scale = SCALE / 1.25, dpi = DPI, limitsize = TRUE)
-    
-    # PCA contribution
-    fviz_pca_var(pca, col.var = "cos2",
-                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
-                repel = TRUE)
-    ggsave("pca_dimensions_repr.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
-    # Feature contribution
-    fviz_contrib(pca, choice="var", axes = 1:ncp)
-    ggsave("pca_feature_contribution.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
-    # Projected data points over the 6 principal components
-    df.principal_components = pca$ind$coord
+
+
+    if (plot_graph) {
+
+        ## Pca explained variance plot
+        pca_df = as.data.frame.matrix(pca$eig)
+        pca_df$id = 1:nrow(pca_df)
+        
+        ggplot(data = pca_df) +
+            ggtitle("Explained variance + cumulative variance") +
+            xlab("Principal component") + ylab("Explained variance") +
+            geom_col(aes(x = id, y = pca_df[,2]), color = "black", fill = "white") +
+            geom_line(aes(x = id, y = pca_df[,3]), color="red") +
+            geom_point(aes(x = id, y = pca_df[,3]), color="red") +
+            scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+            scale_x_continuous(breaks = seq(0, nrow(pca_df), by = 1)) +
+            theme(plot.title = element_text(hjust = 0.5))
+        ggsave("pca_variance_explained.png", plot = last_plot(), path = "images",
+               scale = SCALE / 1.25, dpi = DPI, limitsize = TRUE)
+
+        ## PCA contribution
+        fviz_pca_var(pca, col.var = "cos2",
+                     gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+                     repel = TRUE)
+        ggsave("pca_dimensions_repr.png", plot = last_plot(), path = "images",
+               scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+
+        ## Feature contribution
+        fviz_contrib(pca, choice="var", axes = 1:ncp)
+        ggsave("pca_feature_contribution.png", plot = last_plot(), path = "images",
+               scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
+
+        ## Projected data points over the 6 principal components
+        df.principal_components = pca$ind$coord
+    }
     
     return(df.principal_components)
 }
 
-# Categorical feature
+## Categorical feature
 plot_categorical_feature <- function(df) {
-    # Explicit feature
+    ## Explicit feature
     ggplot(data=df, aes(explicit, fill=factor(award))) +
-    ggtitle("Explicit distribution") +
-    geom_bar(colour="black", position="dodge") +
-    scale_y_continuous(breaks = seq(0, 2000, by = 100)) +
-    theme(plot.title = element_text(hjust = 0.5))
+        ggtitle("Explicit distribution") +
+        geom_bar(colour="black", position="dodge") +
+        scale_y_continuous(breaks = seq(0, 2000, by = 100)) +
+        theme(plot.title = element_text(hjust = 0.5))
     ggsave("explicit_distribution.png", plot = last_plot(), path = "images",
-        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
+           scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
 
-    # Mode feature
+    ## Mode feature
     ggplot(data=df, aes(mode, fill=factor(award))) +
     ggtitle("Mode distribution") +
     geom_bar(colour="black", position="dodge") +
@@ -243,7 +256,7 @@ plot_categorical_feature <- function(df) {
     ggsave("mode_distribution.png", plot = last_plot(), path = "images",
         scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
 
-    # Key feature
+    ## Key feature
     ggplot(data=df, aes(key, fill=factor(award))) +
     ggtitle("Key distribution") +
     geom_bar(colour="black", position="dodge") +
@@ -253,8 +266,8 @@ plot_categorical_feature <- function(df) {
         scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
 }
 
-# Bag of words representation for artists
-build_term_frequency_matrix <- function(df) {
+### Bag of words representation for artists
+build_term_frequency_matrix <- function(df, plot_graph) {
     artists.df = data.frame(artists = df$artists)
     artists.df$award = df$award
     artists.tf =
@@ -267,63 +280,70 @@ build_term_frequency_matrix <- function(df) {
     artists.tf = subset(artists.tf, select = c(2:ncol(artists.tf)))
     
     artists.occurrence = data.frame(occurrence = colSums(artists.tf[-1]))
-    # Artists frequency
-    ggplot(artists.occurrence, aes(occurrence)) +
-        ggtitle("Frequency of occurrences of artists among songs") +
-        xlab("Occurrence in songs") + ylab("Frequency") + 
-        geom_histogram(color="black", fill="white", binwidth = 1) +
-        scale_x_continuous(breaks = seq(0, 100, by = 1)) +
-        scale_y_continuous(breaks = seq(0, 1500, by = 150)) +
-        theme(axis.text.x = element_text(angle = 90),
-                plot.title = element_text(hjust = 0.5))
-    ggsave("artists_occurence.png", plot = last_plot(), path = "images",
-        scale = SCALE / 1.5, dpi = DPI, limitsize = TRUE)
-    # Threshold over occurrence
+
+    if (plot_graph) {
+
+        ## Artists frequency
+        ggplot(artists.occurrence, aes(occurrence)) +
+            ggtitle("Frequency of occurrences of artists among songs") +
+            xlab("Occurrence in songs") + ylab("Frequency") + 
+            geom_histogram(color="black", fill="white", binwidth = 1) +
+            scale_x_continuous(breaks = seq(0, 100, by = 1)) +
+            scale_y_continuous(breaks = seq(0, 1500, by = 150)) +
+            theme(axis.text.x = element_text(angle = 90),
+                  plot.title = element_text(hjust = 0.5))
+        ggsave("artists_occurence.png", plot = last_plot(), path = "images",
+               scale = SCALE / 1.5, dpi = DPI, limitsize = TRUE)
+    }
+    
+
+    ## Threshold over occurrence
     artists.occurrence_thld =
       subset(artists.occurrence,
              artists.occurrence$occurrence >= TERM_FREQUENCY_THLD)
-    ggplot(artists.occurrence_thld, aes(occurrence)) +
-    ggtitle(
-        paste("Frequency of occurrences of artists among songs ( occurrence >=",
-            TERM_FREQUENCY_THLD, ")")) +
-        xlab("Occurrence in songs") + ylab("Frequency") + 
-        geom_histogram(color="black", fill="white", binwidth = 1) +
-      scale_x_continuous(breaks = seq(0, 100, by = 1)) +
-        scale_y_continuous(breaks = seq(0, 1500, by = 20)) +
-        theme(axis.text.x = element_text(angle = 90),
-                plot.title = element_text(hjust = 0.5))
-    ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
-        scale = SCALE, dpi = DPI, limitsize = TRUE)
-    
-    # Wordcloud overall
-    plot_wordcloud(artists.occurrence_thld, "images/wordcloud_overall.png")
-    
-    # Wordcloud award
-    artists.tf_positive = subset(artists.tf,
-                                 artists.tf$award == POSITIVE_CLASS_NAME)
-    artists.occurrence_positive = data.frame(
-      occurrence = colSums(artists.tf_positive[-1]))
-    
-    artists.occurrence_thld_positive =
-      subset(artists.occurrence_positive,
-             artists.occurrence_positive$occurrence >= TERM_FREQUENCY_THLD)
-    plot_wordcloud(artists.occurrence_thld_positive,
-                   "images/wordcloud_positive.png")
-    
-    # Wordcloud not award
-    artists.tf_negative = subset(artists.tf,
-                                 artists.tf$award == NEGATIVE_CLASS_NAME)
-    artists.occurrence_negative = data.frame(
-      occurrence = colSums(artists.tf_negative[-1]))
-    
-    artists.occurrence_thld_negative =
-      subset(artists.occurrence_negative,
-             artists.occurrence_negative$occurrence >= TERM_FREQUENCY_THLD)
-    plot_wordcloud(artists.occurrence_thld_negative,
-                   "images/wordcloud_negative.png")
-    
-    
-    
+
+    if (plot_graph) {
+
+        ggplot(artists.occurrence_thld, aes(occurrence)) +
+            ggtitle(
+                paste("Frequency of occurrences of artists among songs ( occurrence >=",
+                      TERM_FREQUENCY_THLD, ")")) +
+            xlab("Occurrence in songs") + ylab("Frequency") + 
+            geom_histogram(color="black", fill="white", binwidth = 1) +
+            scale_x_continuous(breaks = seq(0, 100, by = 1)) +
+            scale_y_continuous(breaks = seq(0, 1500, by = 20)) +
+            theme(axis.text.x = element_text(angle = 90),
+                  plot.title = element_text(hjust = 0.5))
+        ggsave("artists_occurence_thld.png", plot = last_plot(), path = "images",
+               scale = SCALE, dpi = DPI, limitsize = TRUE)
+        
+        ## Wordcloud overall
+        plot_wordcloud(artists.occurrence_thld, "images/wordcloud_overall.png")
+        
+        ## Wordcloud award
+        artists.tf_positive = subset(artists.tf,
+                                     artists.tf$award == POSITIVE_CLASS_NAME)
+        artists.occurrence_positive = data.frame(
+            occurrence = colSums(artists.tf_positive[-1]))
+        
+        artists.occurrence_thld_positive =
+            subset(artists.occurrence_positive,
+                   artists.occurrence_positive$occurrence >= TERM_FREQUENCY_THLD)
+        plot_wordcloud(artists.occurrence_thld_positive,
+                       "images/wordcloud_positive.png")
+        
+        ## Wordcloud not award
+        artists.tf_negative = subset(artists.tf,
+                                     artists.tf$award == NEGATIVE_CLASS_NAME)
+        artists.occurrence_negative = data.frame(
+            occurrence = colSums(artists.tf_negative[-1]))
+        
+        artists.occurrence_thld_negative = 
+            subset(artists.occurrence_negative,
+                   artists.occurrence_negative$occurrence >= TERM_FREQUENCY_THLD)
+        plot_wordcloud(artists.occurrence_thld_negative,
+                       "images/wordcloud_negative.png")
+    }    
     return(artists.tf[rownames(artists.occurrence_thld)])
 }
 

@@ -296,7 +296,7 @@ resolve_label <- function(df, probs, references){
 }
 
 
-funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color) {
+funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color, filename) {
     ## Split train test set
     set.seed(SEED)
     ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
@@ -318,9 +318,10 @@ funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color
                              predictor = trained_model.probs[, class],
                              levels = levels(testset[,c("award")]))
 
+    png(filename)
     plot(trained_model.ROC, type = "S", col= line_color)
-    ggp
-
+    dev.off()
+    
     return(trained_model)
 
 }
