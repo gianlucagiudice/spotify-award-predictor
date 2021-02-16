@@ -1,7 +1,25 @@
-### ------------- Constants --------------
-NUM_CORES <- detectCores()
+# --------- Libraries ---------
+libraries = c("e1071", "caret", "ROCR", "C50", "pROC", "parallel",
+              "libcoin", "kernlab", "doParallel")
 
-train_target_model <- function(dataframe, method, tune_grid = NULL, tr_control = NULL,
+if (INSTALL_LIBRARIES){
+    install.packages(libraries, dependencies = TRUE, character.only = TRUE)
+}
+for (library in libraries){
+    library(library, character.only = TRUE)
+}
+
+# ------------- Constants --------------
+COST_LIST = 10^(-3:1)
+GAMMA_LIST = 10^(-5:-1)
+COPMLEXITY_LIST = 10^(-2) * (2:15) * 0.75 - 0.01
+
+DPI <- 300
+SCALE = 0.75
+
+
+# --------- Functions ---------
+train_target_model <- function(dataframe, method, tune_grid = NULL,
                                seed, n_folds, train_model = TRUE,
                                dump_model = TRUE, num_cores = 1){
     
@@ -16,7 +34,6 @@ train_target_model <- function(dataframe, method, tune_grid = NULL, tr_control =
                                            method = method,
                                            seed = seed,
                                            tune_grid = tune_grid,
-                                           tr_control = tr_control,
                                            n_folds = n_folds)
         if (DUMP_MODEL){
             ## Save report
@@ -47,12 +64,15 @@ train_target_model <- function(dataframe, method, tune_grid = NULL, tr_control =
     plot_cm(confusion_matrix, method)
     
     # AUC
-    #opt_cut = plot_auc(dataframe, 'radial')
-    #print("Optimal cutoff:")
-    #print(opt_cut)
+    probs = Reduce(union_all, training_report[[3]])
+    references = training_report[[4]]
+    references = resolve_label(dataframe, probs, references)
+    opt_cut = plot_auc(probs, references, method)
+    print("Optimal cutoff:")
+    print(opt_cut)
 }
 
-cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = NULL, seed, n_folds){
+cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds){
     set.seed(seed)
     fold_indexes = createFolds(dataframe$award, k = n_folds)
 
@@ -78,7 +98,7 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = N
                               data = dataframe[train_idx,],
                               method = method,
                               tuneGrid = tune_grid,
-                              trControl = tr_control)
+                              trControl = trainControl(classProbs = TRUE))
         
         ## Save predictions for each fold
         pred = predict(trained_model, dataframe[test_idx, ], type = "prob")
@@ -87,19 +107,23 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, tr_control = N
         references <- c(references, dataframe[test_idx, "award"])
         
         ## Evaluate fold performance
-        fold.positive_performance = list(evaluate_performance(trained_model,
-                                                              dataframe[test_idx, ],
-                                                              POSITIVE_CLASS_NAME))
-        fold.negative_performance = list(evaluate_performance(trained_model,
-                                                              dataframe[test_idx, ],
-                                                              NEGATIVE_CLASS_NAME))
+        fold.positive_performance =
+            list(evaluate_performance(trained_model,
+                                      dataframe[test_idx, ],
+                                      POSITIVE_CLASS_NAME))
+        fold.negative_performance =
+            list(evaluate_performance(trained_model,
+                                      dataframe[test_idx, ],
+                                      NEGATIVE_CLASS_NAME))
 
         ## Append new performance
         performance.positive = c(performance.positive, fold.positive_performance)
         performance.negative = c(performance.negative, fold.negative_performance)
     }
 
-    return(list(performance.positive, performance.negative, predictions, references))
+    return(list(performance.positive,
+                performance.negative,
+                predictions, references))
 }
 
 ### Evaluate model performance
@@ -144,7 +168,10 @@ plot_class_performance <- function(positive, negative, method){
     score <-c(positive[1], negative[1],
               positive[2], negative[2],
               positive[3], negative[3])
-    award <- c("TRUE", "FALSE","TRUE", "FALSE","TRUE", "FALSE")
+    award <- c(
+        POSITIVE_CLASS_NAME, NEGATIVE_CLASS_NAME,
+        POSITIVE_CLASS_NAME, NEGATIVE_CLASS_NAME,
+        POSITIVE_CLASS_NAME, NEGATIVE_CLASS_NAME)
     data.plot = data.frame(metric, score, award)
     
     ggplot(data=data.plot,
@@ -194,9 +221,12 @@ plot_performance <- function(cm, positive, negative, method){
 ## Plot confusion matrix
 plot_cm <- function(cm, method){
     cm = as.data.frame(cm)
+    
     ggplot(data = cm,
-           aes(x = factor(Reference, level = c('TRUE', 'FALSE')),
-               y = factor(Prediction, level = c('FALSE', 'TRUE')))) +
+           aes(x = factor(Reference, level = c(POSITIVE_CLASS_NAME,
+                                               NEGATIVE_CLASS_NAME)),
+               y = factor(Prediction, level = c(NEGATIVE_CLASS_NAME,
+                                                POSITIVE_CLASS_NAME)))) +
         geom_tile(aes(fill = Freq), colour = "white") +
         scale_fill_gradient(low = "white", high = "steelblue",
                             limits=c(0, max(cm$Freq))) +
@@ -208,4 +238,58 @@ plot_cm <- function(cm, method){
     filename = paste(method, "_cm.png", sep="")
     ggsave(filename, plot = last_plot(), path = "images",
            scale = 0.5, dpi = floor(DPI), limitsize = TRUE)
+}
+
+## Plot AUC
+plot_auc <- function(pred.prob, references, method){
+    pred.to.roc = pred.prob[, 2]
+    #Plot
+    pred.rocr = prediction(pred.to.roc, references)
+    perf.rocr = performance(pred.rocr, measure = "auc", x.measure = "cutoff") 
+    perf.tpr.rocr = performance(pred.rocr, "tpr","fpr") 
+    opt_cut = opt.cut(perf.tpr.rocr, pred.rocr)
+    # ROC curve
+    filename = paste("images/", method, "_auc.png", sep="")
+    png(filename)
+    plot(perf.tpr.rocr, colorize=T,main=paste("AUC:",(perf.rocr@y.values)))
+    abline(a=0, b=1)
+    dev.off()
+    # Best cutoff
+    acc.perf = performance(pred.rocr, measure = "acc")
+    filename = paste("images/", method, "_cutoff_auc.png", sep="")
+    png(filename)
+    plot(acc.perf, main = "Accurancy to changes in cutoff")
+    dev.off()
+    
+    return(opt_cut)
+}
+
+
+## Optimal cutoff
+opt.cut = function(perf, pred){
+    cut.ind = mapply(FUN=function(x, y, p){
+        d = (x - 0)^2 + (y-1)^2
+        ind = which(d == min(d))
+        c(sensitivity = y[[ind]], specificity = 1-x[[ind]],
+          cutoff = p[[ind]])
+    }, perf@x.values, perf@y.values, pred@cutoffs)
+}
+
+## Resolve labels
+resolve_label <- function(df, probs, references){
+    label_is_positive <-
+        df[rownames(probs)[1], "award"] == POSITIVE_CLASS_NAME
+    
+    if (label_is_positive & references[1] == "1"){
+        factor_1 = POSITIVE_CLASS_NAME
+        factor_2 = NEGATIVE_CLASS_NAME
+    } else{
+        factor_1 = NEGATIVE_CLASS_NAME
+        factor_2 = POSITIVE_CLASS_NAME
+    }
+    
+    references_resolved = recode_factor(
+        references, "1" = factor_1, "2" = factor_2)
+    
+    return(references_resolved)
 }

@@ -59,83 +59,39 @@ df.out = build_out_dataframe(
 print(paste("Dimension of the dataset for training (rows x columns):",
             dim(df.out)[1], dim(df.out)[2]))
 
+dataframe = df.out
 
 ## ----------- DA RIMUOVERE -----------
-# Reduced dataframe for tests purpose
 df.reduced = subset(df.out, select = c(661, 662, 666))
-df.reduced = union_all(df.reduced[1:100,], df.reduced[2500:2600,])
+df.reduced = union_all(df.reduced[1:500,], df.reduced[2500:(2500+500),])
 colnames(df.reduced) <- make.names(colnames(df.reduced))
+dataframe = df.reduced
 ## ----------- DA RIMUOVERE -----------
 
 
 # ------------ Training ------------
 # ==== SVM ====
 method = "svmRadial"
-tune_grid = expand.grid(
-  C = COST_LIST,
-  sigma = GAMMA_LIST)
-## ------ CAMBIARE IL DATAFRAME!!!!!!!! ------------
-train_target_model(dataframe = df.reduced,
+tune_grid = expand.grid(C = COST_LIST, sigma = GAMMA_LIST)
+train_target_model(dataframe = dataframe,
                    method = method,
                    tune_grid = tune_grid,
                    seed = SEED,
                    n_folds = N_FOLDS,
                    num_cores = NUM_CORES)
 
-#  ==== Decision Tree ====
+#  ==== SVM LINEAR ====
+# Inserire qui
 
+#  ==== DECISION TREE ====
 method = "rpart"
-control = trainControl(classProbs = TRUE)
+tune_grid = expand.grid(cp = COPMLEXITY_LIST)
+train_target_model(dataframe = dataframe,
+                   method = method,
+                   seed = SEED,
+                   n_folds = N_FOLDS,
+                   num_cores = NUM_CORES)
 
-training_report.decision_tree = cross_validation(dataframe = df.reduced,
-                                                 method = method,
-                                                 seed = SEED,
-                                                 tr_control = control,
-                                                 n_folds = N_FOLDS)
-
-# 1 = FALSE (not_award) 2 = TRUE (award)
-
-probs = training_report.decision_tree[[3]]
-references = training_report.decision_tree[[4]]
-
-
-
-training_report.decision_tree = train_target_model(dataframe = df.out,
-                                                   method = method,
-                                                   seed = SEED,
-                                                   n_folds = N_FOLDS,
-                                                   num_cores = 4)
-
-training_report.decision_tree = train_target_model(dataframe = df.reduced,
-                                                   method = method,
-                                                   seed = SEED,
-                                                   n_folds = N_FOLDS,
-                                                   num_cores = 4)
-
-
-
-### TODO tutte le analisi del caso
-decision_tree.performance.positive_folds = training_report.decision_tree[[1]]
-decision_tree.performance.negative_folds = training_report.decision_tree[[2]]
-
-## Class performance
-decision_tree.performance.positive = combine_folds_performance(decision_tree.performance.positive_folds)
-decision_tree.performance.negative = combine_folds_performance(decision_tree.performance.negative_folds)
-
-plot_class_performance(
-  decision_tree.performance.positive[5:7],
-  decision_tree.performance.negative[5:7],
-  method)
-
-## Confusion matrix
-decision_tree.performance.confusion_matrix = combine_folds_cm(decision_tree.performance.positive_folds)
-plot_performance(
-  decision_tree.performance.confusion_matrix,
-  decision_tree.performance.positive,
-  decision_tree.performance.negative, "decision_tree_performance.png")
-plot_cm(
-  decision_tree.performance.confusion_matrix,
-  method)
 
 ### ------- Model comparison -------
 ### TODO 
