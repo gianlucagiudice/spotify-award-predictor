@@ -1,4 +1,4 @@
-# --------- Libraries ---------
+### --------- Libraries ---------
 libraries = c("e1071", "caret", "ROCR", "C50", "pROC", "parallel",
               "libcoin", "kernlab", "doParallel")
 
@@ -9,7 +9,7 @@ for (library in libraries){
     library(library, character.only = TRUE)
 }
 
-# ------------- Constants --------------
+### ------------- Constants --------------
 COST_LIST = 10^(-3:1)
 GAMMA_LIST = 10^(-5:-1)
 COMPLEXITY_LIST = 10^(-2) * (2:15) * 0.75 - 0.01
@@ -18,7 +18,7 @@ DPI <- 300
 SCALE = 0.75
 
 
-# --------- Functions ---------
+### --------- Functions ---------
 train_target_model <- function(dataframe, method, tune_grid = NULL,
                                seed, n_folds, train_model = TRUE,
                                dump_model = TRUE, num_cores = 1){
@@ -63,7 +63,7 @@ train_target_model <- function(dataframe, method, tune_grid = NULL,
                      method)
     plot_cm(confusion_matrix, method)
     
-    # AUC
+    ## AUC
     probs = Reduce(union_all, training_report[[3]])
     references = training_report[[4]]
     references = resolve_label(dataframe, probs, references)
@@ -189,7 +189,7 @@ plot_class_performance <- function(positive, negative, method){
            scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
-## Plot overall performance
+### Plot overall performance
 plot_performance <- function(cm, positive, negative, method){
     ## Accuracy
     acc = (cm[1] + cm[4]) / (cm[1] + cm[2] + cm[3] + cm[4])
@@ -218,7 +218,7 @@ plot_performance <- function(cm, positive, negative, method){
            scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
-## Plot confusion matrix
+### Plot confusion matrix
 plot_cm <- function(cm, method){
     cm = as.data.frame(cm)
     
@@ -241,21 +241,21 @@ plot_cm <- function(cm, method){
 }
 
 
-## Plot AUC
+### Plot AUC
 plot_auc <- function(pred.prob, references, method){
     pred.to.roc = pred.prob[, 2]
-    #Plot
+    ##Plot
     pred.rocr = prediction(pred.to.roc, references)
     perf.rocr = performance(pred.rocr, measure = "auc", x.measure = "cutoff") 
     perf.tpr.rocr = performance(pred.rocr, "tpr","fpr") 
     opt_cut = opt.cut(perf.tpr.rocr, pred.rocr)
-    # ROC curve
+    ## ROC curve
     filename = paste("images/", method, "_auc.png", sep="")
     png(filename)
     plot(perf.tpr.rocr, colorize=T,main=paste("AUC:",(perf.rocr@y.values)))
     abline(a=0, b=1)
     dev.off()
-    # Best cutoff
+    ## Best cutoff
     acc.perf = performance(pred.rocr, measure = "acc")
     filename = paste("images/", method, "_cutoff_auc.png", sep="")
     png(filename)
@@ -266,7 +266,7 @@ plot_auc <- function(pred.prob, references, method){
 }
 
 
-## Optimal cutoff
+### Optimal cutoff
 opt.cut = function(perf, pred){
     cut.ind = mapply(FUN=function(x, y, p){
         d = (x - 0)^2 + (y-1)^2
@@ -276,7 +276,7 @@ opt.cut = function(perf, pred){
     }, perf@x.values, perf@y.values, pred@cutoffs)
 }
 
-## Resolve labels
+### Resolve labels
 resolve_label <- function(df, probs, references){
     label_is_positive <-
         df[rownames(probs)[1], "award"] == POSITIVE_CLASS_NAME
@@ -323,6 +323,46 @@ funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color
     dev.off()
     
     return(trained_model)
+}
 
+compare_statistics <- function (dataframe, decision_tree_method, svm_method, seed, n_folds, repeats) {
+
+    ## Split train test set
+    set.seed(SEED)
+    ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
+    trainset <- dataframe[ind == 1,]
+    testset <- dataframe[ind == 2,]
+
+    control <- trainControl(method = "repeatedcv", number = n_folds,repeats = repeats,
+                            classProbs = TRUE, summaryFunction = twoClassSummary)
+
+    decision_tree.model <- train(award ~ .,
+                                 data = trainset,
+                                 method = decision_tree_method,
+                                 metric = "ROC",
+                                 trControl = control)
+
+    svm.model <- train(award ~ .,
+                       data = trainset,
+                       method = decision_tree_method,
+                       metric = "ROC",
+                       trControl = control)
+
+    cv.values = resamples(list(svm=svm.model, rpart = decision_tree.model))
+    summary(cv.values)
+
+    png("images/compare_dot_plot.png")
+    dotplot(cv.values, metric = "ROC")
+    dev.off()
+
+    png("images/compare_bw_plot.png")
+    bwplot(cv.values, layout = c(3, 1))
+    dev.off()
+
+    png("images/compare_splom_plot.png")
+    splom(cv.values,metric="ROC")
+    dev.off()
+    
+    print(cv.values$timings)
 }
 

@@ -100,3 +100,5 @@ train_target_model(dataframe = df.out,
 
 decision_tree <- funzione_roc(df.out, "rpart", "award", 2, 1, "darkgreen")
 svm <- funzione_roc(df.out, "svmRadial", 2, 1, "red")
+
+compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, 3)
