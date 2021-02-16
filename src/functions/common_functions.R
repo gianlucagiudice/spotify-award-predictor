@@ -329,38 +329,39 @@ compare_statistics <- function (dataframe, decision_tree_method, svm_method, see
 
     ## Split train test set
     set.seed(SEED)
-    ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
-    trainset <- dataframe[ind == 1,]
-    testset <- dataframe[ind == 2,]
+    ## ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
+    ## trainset <- dataframe[ind == 1,]
+    ## testset <- dataframe[ind == 2,]
 
     control <- trainControl(method = "repeatedcv", number = n_folds,repeats = repeats,
                             classProbs = TRUE, summaryFunction = twoClassSummary)
 
     decision_tree.model <- train(award ~ .,
-                                 data = trainset,
+                                 data = dataframe,
                                  method = decision_tree_method,
                                  metric = "ROC",
                                  trControl = control)
-
+    
     svm.model <- train(award ~ .,
-                       data = trainset,
-                       method = decision_tree_method,
-                       metric = "ROC",
+                       data = dataframe,
+                       method = svm_method,
+                       tuneGrid = expand.grid(C = COST_LIST, sigma = GAMMA_LIST),
+                       metric = "ROC",                       
                        trControl = control)
 
     cv.values = resamples(list(svm=svm.model, rpart = decision_tree.model))
     summary(cv.values)
 
     png("images/compare_dot_plot.png")
-    dotplot(cv.values, metric = "ROC")
+    print (dotplot(cv.values, metric = "ROC"))
     dev.off()
 
     png("images/compare_bw_plot.png")
-    bwplot(cv.values, layout = c(3, 1))
+    print (bwplot(cv.values, layout = c(3, 1)))
     dev.off()
 
     png("images/compare_splom_plot.png")
-    splom(cv.values,metric="ROC")
+    print (splom(cv.values, metric= "ROC"))
     dev.off()
     
     print(cv.values$timings)
