@@ -12,7 +12,7 @@ for (library in libraries){
 # ------------- Constants --------------
 COST_LIST = 10^(-3:1)
 GAMMA_LIST = 10^(-5:-1)
-COPMLEXITY_LIST = 10^(-2) * (2:15) * 0.75 - 0.01
+COMPLEXITY_LIST = 10^(-2) * (2:15) * 0.75 - 0.01
 
 DPI <- 300
 SCALE = 0.75
@@ -319,6 +319,7 @@ funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color
                              levels = levels(testset[,c("award")]))
 
     plot(trained_model.ROC, type = "S", col= line_color)
+    ggp
 
     return(trained_model)
 

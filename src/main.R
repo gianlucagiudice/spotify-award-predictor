@@ -85,7 +85,7 @@ train_target_model(dataframe = dataframe,
 
 #  ==== DECISION TREE ====
 method = "rpart"
-tune_grid = expand.grid(cp = COPMLEXITY_LIST)
+tune_grid = expand.grid(cp = COMPLEXITY_LIST)
 train_target_model(dataframe = dataframe,
                    method = method,
                    seed = SEED,
