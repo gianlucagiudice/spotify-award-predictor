@@ -1,16 +1,17 @@
 ### ------- Load custom functions -------
 INSTALL_LIBRARIES = FALSE
-DUMP_MODEL = FALSE
+DUMP_MODEL = TRUE
 TRAIN_MODEL = TRUE
-PLOT_GRAPHS = FALSE
+PLOT_GRAPHS = TRUE
+
 source('src/functions/preprocessing.R')
-source('src/functions/training_svm.R')
 source('src/functions/common_functions.R')
 source('src/functions/decision_tree.R')
 
 ### ------------- Constants --------------
 DPI <- 300
 SCALE = 0.75
+RES = 1800
 
 POSITIVE_CLASS_NAME = "award"
 NEGATIVE_CLASS_NAME = "not_award"
@@ -20,9 +21,22 @@ YEAR_THLD <- 2005
 POPULARITY_THLD <- 25
 SEED = 830694 + 829664
 NPC <- 7 # Number of principal components
-N_FOLDS = 10 # Cross validation parameter
 
-NUM_CORES = detectCores(logical = TRUE) # Number of cores
+NUM_CORES = detectCores(logical = TRUE) # Number of cores to use
+
+# Training parameters
+N_FOLDS = 10 # Cross validation parameter
+N_REPEATS = 3
+
+COST_LIST = 10^(-3:1)
+GAMMA_LIST = 10^(-5:-1)
+COMPLEXITY_LIST = 10^(-2) * (1:10) * 1
+
+METHODS_LIST = list("svmRadial", "svmLinear", "rpart")
+TUNE_GRID_LIST = list(
+  expand.grid(C = COST_LIST, sigma = GAMMA_LIST),
+  expand.grid(C = COST_LIST),
+  expand.grid(cp = COMPLEXITY_LIST))
 
 
 ### ------------ Preprocessing ------------
@@ -30,7 +44,7 @@ NUM_CORES = detectCores(logical = TRUE) # Number of cores
 data = read_dataset("data/songs.csv")
 print(head(data))
 ## Plot data
-data_visualization(data, POPULARITY_THLD, YEAR_THLD)
+data_visualization(data, POPULARITY_THLD, YEAR_THLD, PLOT_GRAPHS)
 ## Songs after 2005 and minimum popularity
 data <- subset(data, year >= YEAR_THLD & popularity > POPULARITY_THLD)
 ## Build a balanced dataset
@@ -48,7 +62,7 @@ df.principal_components = perform_pca(df.numeric, NPC, PLOT_GRAPHS)
 print(head(df.principal_components))
 
 ## Plot categorical feature
-plot_categorical_feature(df)
+plot_categorical_feature(df, PLOT_GRAPHS)
 
 ## Bag of words representation for artists
 artists.tf_thld <- build_term_frequency_matrix(df, PLOT_GRAPHS)
@@ -66,39 +80,39 @@ dataframe = df.out
 
 ## ----------- DA RIMUOVERE -----------
 df.reduced = subset(df.out, select = c(661, 662, 666))
-df.reduced = union_all(df.reduced[1:500,], df.reduced[2500:(2500+500),])
+df.reduced = union_all(df.reduced[1:150,], df.reduced[2500:(2500+150),])
 colnames(df.reduced) <- make.names(colnames(df.reduced))
 dataframe = df.reduced
 ## ----------- DA RIMUOVERE -----------
 
 
 ### ------------ Training ------------
-### ==== SVM ====
-method = "svmRadial"
-tune_grid = expand.grid(C = COST_LIST, sigma = GAMMA_LIST)
-train_target_model(dataframe = dataframe,
-                   method = method,
-                   tune_grid = tune_grid,
-                   seed = SEED,
-                   n_folds = N_FOLDS,
-                   num_cores = NUM_CORES)
-
-###  ==== SVM LINEAR ====
-### Inserire qui
-
-###  ==== DECISION TREE ====
-tune_grid = expand.grid(cp = COMPLEXITY_LIST)
-train_target_model(dataframe = df.out,
-                   method = "rpart",
-                   seed = SEED,
-                   n_folds = N_FOLDS,
-                   num_cores = NUM_CORES)
-
+print("=========== START MODELS TRAINING ===========")
+for (i in 1:length(METHODS_LIST)){
+  method = METHODS_LIST[[i]]
+  tune_grid = TUNE_GRID_LIST[[i]]
+  
+  print(paste(">>>", method))
+  train_target_model(dataframe = dataframe,
+                     method = method,
+                     tune_grid = tune_grid,
+                     seed = SEED,
+                     n_folds = N_FOLDS,
+                     num_cores = NUM_CORES)
+  print("------------")
+}
 
 ### ------- Model comparison -------
-### TODO 
+print("=========== START COMPARISON ===========")
+compare_statistics(dataframe = dataframe,
+                   methods_list = METHODS_LIST,
+                   tune_grid_list = TUNE_GRID_LIST,
+                   seed = SEED,
+                   n_folds = N_FOLDS,
+                   repeats = N_REPEATS,
+                   num_cores = NUM_CORES)
 
-decision_tree <- funzione_roc(df.out, "rpart", "award", 2, 1, "darkgreen")
-svm <- funzione_roc(df.out, "svmRadial", 2, 1, "red")
+#decision_tree <- funzione_roc(df.out, "rpart", "award", 2, 1, "darkgreen")
+#svm <- funzione_roc(df.out, "svmRadial", 2, 1, "red")
 
-compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, 3)
+#compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, N_REPEATS)

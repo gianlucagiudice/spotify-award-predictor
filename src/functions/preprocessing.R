@@ -49,7 +49,11 @@ to_lower <- function(input_list){
 }
 
 # Data exploartion
-data_visualization <- function(data_all, popularity_thld, year_yhld) {
+data_visualization <- function(data_all, popularity_thld, year_yhld, plot_graphs) {
+  if(!plot_graphs){
+    return()
+  }
+  
     data = subset(data_all, year >= year_yhld)
     
     # Year distribution
@@ -196,8 +200,6 @@ perform_pca <- function(active, ncp, plot_graph) {
     pca = PCA(active, scale.unit = TRUE, ncp = ncp, graph = plot_graph)
     print("PCA results:")
     print(pca$eig)
-    
-
 
     if (plot_graph) {
 
@@ -229,15 +231,18 @@ perform_pca <- function(active, ncp, plot_graph) {
         ggsave("pca_feature_contribution.png", plot = last_plot(), path = "images",
                scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 
-        ## Projected data points over the 6 principal components
-        df.principal_components = pca$ind$coord
     }
+    ## Projected data points over the 7 principal components
+    df.principal_components = pca$ind$coord
     
     return(df.principal_components)
 }
 
 ## Categorical feature
-plot_categorical_feature <- function(df) {
+plot_categorical_feature <- function(df, plot_graph) {
+    if (!plot_graph){
+        return();
+    }
     ## Explicit feature
     ggplot(data=df, aes(explicit, fill=factor(award))) +
         ggtitle("Explicit distribution") +

@@ -9,14 +9,6 @@ for (library in libraries){
     library(library, character.only = TRUE)
 }
 
-### ------------- Constants --------------
-COST_LIST = 10^(-3:1)
-GAMMA_LIST = 10^(-5:-1)
-COMPLEXITY_LIST = 10^(-2) * (2:15) * 0.75 - 0.01
-
-DPI <- 300
-SCALE = 0.75
-
 
 ### --------- Functions ---------
 train_target_model <- function(dataframe, method, tune_grid = NULL,
@@ -67,8 +59,13 @@ train_target_model <- function(dataframe, method, tune_grid = NULL,
     probs = Reduce(union_all, training_report[[3]])
     references = training_report[[4]]
     references = resolve_label(dataframe, probs, references)
-    opt_cut = plot_auc(probs, references, method)
-    print("Optimal cutoff:")
+    ## Positive class
+    opt_cut = plot_auc(probs, references, method, POSITIVE_CLASS_NAME)
+    print("Optimal cutoff positive class:")
+    print(opt_cut)
+    ## Negative class
+    opt_cut = plot_auc(probs, references, method, NEGATIVE_CLASS_NAME)
+    print("Optimal cutoff negative class:")
     print(opt_cut)
 }
 
@@ -98,6 +95,7 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds)
                               data = dataframe[train_idx,],
                               method = method,
                               tuneGrid = tune_grid,
+                              preProc = c("center", "scale"),
                               trControl = trainControl(classProbs = TRUE))
         
         ## Save predictions for each fold
@@ -208,13 +206,16 @@ plot_performance <- function(cm, positive, negative, method){
                y = score)) +
         ggtitle("Perfomance - Overall (macro average)") +
         labs(fill="Award") +
+        coord_flip() +
         xlab("Metric") + ylab("Score") + 
         geom_col(colour="black", fill="blue", position="dodge") +
         scale_y_continuous(breaks=seq(0, 1, 0.025)) +
-        theme(plot.title = element_text(hjust = 0.5))
+        theme(plot.title = element_text(hjust = 0.5),
+              axis.text.x = element_text(angle = 90))
     
     filename = paste(method, "_performance.png", sep="")
     ggsave(filename, plot = last_plot(), path = "images",
+           height=15, width=25, units="cm",
            scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
@@ -242,29 +243,28 @@ plot_cm <- function(cm, method){
 
 
 ### Plot AUC
-plot_auc <- function(pred.prob, references, method){
-    pred.to.roc = pred.prob[, 2]
+plot_auc <- function(pred.prob, references, method, class){
+    pred.to.roc = pred.prob[, class]
     ##Plot
     pred.rocr = prediction(pred.to.roc, references)
     perf.rocr = performance(pred.rocr, measure = "auc", x.measure = "cutoff") 
     perf.tpr.rocr = performance(pred.rocr, "tpr","fpr") 
     opt_cut = opt.cut(perf.tpr.rocr, pred.rocr)
     ## ROC curve
-    filename = paste("images/", method, "_auc.png", sep="")
+    filename = paste("images/", method, "_", class, "_auc.png", sep="")
     png(filename)
     plot(perf.tpr.rocr, colorize=T,main=paste("AUC:",(perf.rocr@y.values)))
     abline(a=0, b=1)
     dev.off()
     ## Best cutoff
     acc.perf = performance(pred.rocr, measure = "acc")
-    filename = paste("images/", method, "_cutoff_auc.png", sep="")
+    filename = paste("images/", method, "_", class, "_cutoff_auc.png", sep="")
     png(filename)
     plot(acc.perf, main = "Accurancy to changes in cutoff")
     dev.off()
     
     return(opt_cut)
 }
-
 
 ### Optimal cutoff
 opt.cut = function(perf, pred){
@@ -325,8 +325,7 @@ funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color
     return(trained_model)
 }
 
-compare_statistics <- function (dataframe, decision_tree_method, svm_method, seed, n_folds, repeats) {
-
+compare_statistics_old <- function (dataframe, decision_tree_method, svm_method, seed, n_folds, repeats) {
     ## Split train test set
     set.seed(SEED)
     ## ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
@@ -362,6 +361,74 @@ compare_statistics <- function (dataframe, decision_tree_method, svm_method, see
 
     png("images/compare_splom_plot.png")
     print (splom(cv.values, metric= "ROC"))
+    dev.off()
+    
+    print(cv.values$timings)
+}
+
+
+compare_statistics <- function (dataframe, methods_list, tune_grid_list,
+                                seed, n_folds, repeats, num_cores) {
+    set.seed(SEED)
+
+    control <- trainControl(method = "repeatedcv", number = n_folds, repeats = repeats,
+                            classProbs = TRUE, summaryFunction = twoClassSummary,
+                            verboseIter = TRUE, allowParallel = TRUE)
+
+    ## Training
+    filename = paste("models_comparison.RData", sep="")
+    if (TRAIN_MODEL){
+        trained_models = list()
+        
+        ## Start cluster
+        cl <- makePSOCKcluster(num_cores)
+        registerDoParallel(cl)
+        
+        ## Start training
+        for (i in 1:length(METHODS_LIST)){
+            method = METHODS_LIST[[i]]
+            tune_grid = TUNE_GRID_LIST[[i]]
+            
+            print(paste(">>>", method))
+            trained <- train(award ~ .,
+                             data = dataframe,
+                             method = method,
+                             tuneGrid = tune_grid,
+                             metric = "ROC",
+                             preProc = c("center", "scale"),
+                             trControl = control) 
+            # Append the new model
+            trained_models[[method]] = trained
+        }
+        
+        ## Stop cluster
+        stopCluster(cl)
+        
+        if (DUMP_MODEL){
+            ## Save report
+            save(trained_models, file=filename)
+        }
+    }else{
+        load(filename)
+    }
+    
+    ## Statistics
+    cv.values = resamples(trained_models)
+    summary(cv.values)
+
+    png("images/compare_dot_plot.png",
+        res = RES, width = 20, height = 20, units = "cm")
+    dotplot(cv.values, metric = "ROC")
+    dev.off()
+
+    png("images/compare_bw_plot.png",
+        res = RES, width = 40, height = 20, units = "cm")
+    bwplot(cv.values, layout = c(3, 1))
+    dev.off()
+
+    png("images/compare_splom_plot.png",
+        res = RES, width = 20, height = 20, units = "cm")
+    splom(cv.values, metric = "ROC")
     dev.off()
     
     print(cv.values$timings)
