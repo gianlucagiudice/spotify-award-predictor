@@ -104,12 +104,12 @@ for (i in 1:length(METHODS_LIST)){
 
 ### ------- Model comparison -------
 print("=========== START COMPARISON ===========")
-compare_statistics(dataframe = dataframe,
-                   methods_list = METHODS_LIST,
-                   tune_grid_list = TUNE_GRID_LIST,
-                   seed = SEED,
-                   n_folds = N_FOLDS,
-                   repeats = N_REPEATS,
-                   num_cores = NUM_CORES)
+models_statistics <- compare_statistics(dataframe = dataframe,
+                                        methods_list = METHODS_LIST,
+                                        tune_grid_list = TUNE_GRID_LIST,
+                                        seed = SEED,
+                                        n_folds = N_FOLDS,
+                                        repeats = N_REPEATS,
+                                        num_cores = NUM_CORES)
 
 ##compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, N_REPEATS)
