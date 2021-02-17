@@ -34,9 +34,9 @@ COMPLEXITY_LIST = 10^(-2) * (1:10) * 1
 
 METHODS_LIST = list("svmRadial", "svmLinear", "rpart")
 TUNE_GRID_LIST = list(
-  expand.grid(C = COST_LIST, sigma = GAMMA_LIST),
-  expand.grid(C = COST_LIST),
-  expand.grid(cp = COMPLEXITY_LIST))
+    expand.grid(C = COST_LIST, sigma = GAMMA_LIST), ## svmRadial
+    expand.grid(C = COST_LIST), ##svmlinear
+    NULL) ## rpart
 
 
 ### ------------ Preprocessing ------------
@@ -112,7 +112,4 @@ compare_statistics(dataframe = dataframe,
                    repeats = N_REPEATS,
                    num_cores = NUM_CORES)
 
-#decision_tree <- funzione_roc(df.out, "rpart", "award", 2, 1, "darkgreen")
-#svm <- funzione_roc(df.out, "svmRadial", 2, 1, "red")
-
-#compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, N_REPEATS)
+##compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, N_REPEATS)

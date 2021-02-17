@@ -296,35 +296,6 @@ resolve_label <- function(df, probs, references){
 }
 
 
-funzione_roc <- function (dataframe, method, class, n_folds, repeats, line_color, filename) {
-    ## Split train test set
-    set.seed(SEED)
-    ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
-    trainset <- dataframe[ind == 1,]
-    testset <- dataframe[ind == 2,]
-
-    control <- trainControl(method = "repeatedcv", number = n_folds,repeats = repeats,
-                            classProbs = TRUE, summaryFunction = twoClassSummary)
-    
-    trained_model <- train(award ~ .,
-                           data = trainset,
-                           method = method,
-                           metric = "ROC",
-                           trControl = control)
-
-    trained_model.probs <- predict(trained_model, testset, type = "prob")
-
-    trained_model.ROC <- roc(response = testset [,c("award")],
-                             predictor = trained_model.probs[, class],
-                             levels = levels(testset[,c("award")]))
-
-    png(filename)
-    plot(trained_model.ROC, type = "S", col= line_color)
-    dev.off()
-    
-    return(trained_model)
-}
-
 compare_statistics_old <- function (dataframe, decision_tree_method, svm_method, seed, n_folds, repeats) {
     ## Split train test set
     set.seed(SEED)
@@ -375,10 +346,11 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
                             classProbs = TRUE, summaryFunction = twoClassSummary,
                             verboseIter = TRUE, allowParallel = TRUE)
 
+    trained_models = list()
+    
     ## Training
     filename = paste("models_comparison.RData", sep="")
-    if (TRAIN_MODEL){
-        trained_models = list()
+    if (TRAIN_MODEL){      
         
         ## Start cluster
         cl <- makePSOCKcluster(num_cores)
@@ -432,5 +404,7 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
     dev.off()
     
     print(cv.values$timings)
+
+    return (trained_models)
 }
 
