@@ -95,8 +95,9 @@ cross_validation <- function(dataframe, method, tune_grid = NULL, seed, n_folds)
                               data = dataframe[train_idx,],
                               method = method,
                               tuneGrid = tune_grid,
-                              preProc = c("center", "scale"),
-                              trControl = trainControl(classProbs = TRUE))
+                              trControl = trainControl(classProbs = TRUE,
+                                                       method = "cv",
+                                                       number = 10))
         
         ## Save predictions for each fold
         pred = predict(trained_model, dataframe[test_idx, ], type = "prob")
@@ -300,8 +301,9 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
                                 seed, n_folds, repeats, num_cores) {
     set.seed(SEED)
 
-    control <- trainControl(method = "repeatedcv", number = n_folds, repeats = repeats,
-                            classProbs = TRUE, summaryFunction = twoClassSummary,
+    control <- trainControl(method = "repeatedcv", number = n_folds,
+                            repeats = repeats, classProbs = TRUE,
+                            summaryFunction = twoClassSummary,
                             verboseIter = TRUE, allowParallel = TRUE)
 
     trained_models = list()
@@ -325,7 +327,6 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
                              method = method,
                              tuneGrid = tune_grid,
                              metric = "ROC",
-                             preProc = c("center", "scale"),
                              trControl = control) 
             # Append the new model
             trained_models[[method]] = trained
