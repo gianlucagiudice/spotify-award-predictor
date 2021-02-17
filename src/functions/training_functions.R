@@ -1,15 +1,3 @@
-### --------- Libraries ---------
-libraries = c("e1071", "caret", "ROCR", "C50", "pROC", "parallel",
-              "libcoin", "kernlab", "doParallel")
-
-if (INSTALL_LIBRARIES){
-    install.packages(libraries, dependencies = TRUE, character.only = TRUE)
-}
-for (library in libraries){
-    library(library, character.only = TRUE)
-}
-
-
 ### --------- Functions ---------
 train_target_model <- function(dataframe, method, tune_grid = NULL,
                                seed, n_folds, train_model = TRUE,
@@ -140,6 +128,7 @@ combine_folds_performance <- function(performance_folds){
     for (i in 1:length(performance_folds)){
         folds = c(folds, list(performance_folds[[i]]$byClass))
     }
+    # TODO: Da cambiare
     values = matrix(unlist(folds), nrow=11)
     values = rowSums(values) / length(performance_folds)
     return(values)
