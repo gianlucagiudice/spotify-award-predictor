@@ -4,8 +4,8 @@ DUMP_MODEL <- TRUE
 TRAIN_MODEL <- TRUE
 PLOT_GRAPHS <- FALSE
 
-source('src/functions/preprocessing.R')
-source('src/functions/common_functions.R')
+source('src/functions/preprocessing_functions.R')
+source('src/functions/training_functions.R')
 
 ### ------------- Constants --------------
 DPI <- 300

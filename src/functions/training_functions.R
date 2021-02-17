@@ -296,48 +296,6 @@ resolve_label <- function(df, probs, references){
 }
 
 
-compare_statistics_old <- function (dataframe, decision_tree_method, svm_method, seed, n_folds, repeats) {
-    ## Split train test set
-    set.seed(SEED)
-    ## ind = sample(2, nrow(dataframe), replace = TRUE, prob=c(0.7, 0.3))
-    ## trainset <- dataframe[ind == 1,]
-    ## testset <- dataframe[ind == 2,]
-
-    control <- trainControl(method = "repeatedcv", number = n_folds,repeats = repeats,
-                            classProbs = TRUE, summaryFunction = twoClassSummary)
-
-    decision_tree.model <- train(award ~ .,
-                                 data = dataframe,
-                                 method = decision_tree_method,
-                                 metric = "ROC",
-                                 trControl = control)
-    
-    svm.model <- train(award ~ .,
-                       data = dataframe,
-                       method = svm_method,
-                       tuneGrid = expand.grid(C = COST_LIST, sigma = GAMMA_LIST),
-                       metric = "ROC",                       
-                       trControl = control)
-
-    cv.values = resamples(list(svm=svm.model, rpart = decision_tree.model))
-    summary(cv.values)
-
-    png("images/compare_dot_plot.png")
-    print (dotplot(cv.values, metric = "ROC"))
-    dev.off()
-
-    png("images/compare_bw_plot.png")
-    print (bwplot(cv.values, layout = c(3, 1)))
-    dev.off()
-
-    png("images/compare_splom_plot.png")
-    print (splom(cv.values, metric= "ROC"))
-    dev.off()
-    
-    print(cv.values$timings)
-}
-
-
 compare_statistics <- function (dataframe, methods_list, tune_grid_list,
                                 seed, n_folds, repeats, num_cores) {
     set.seed(SEED)
