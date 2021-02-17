@@ -8,3 +8,6 @@
 
 ### Da fare
 Non sono sicuro che per gli artisti è stata fatta una rappresentazione one hot encoding, nel senso che non sono sicuro si chiami in questo modo.
+
+
+### Rimuovere TODO da latex
