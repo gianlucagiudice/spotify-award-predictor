@@ -29,6 +29,7 @@ N_FOLDS <- 10 ## Cross validation parameter
 N_REPEATS <- 3
 
 METHODS_LIST <- list("svmRadial", "svmLinear", "rpart")
+#COMPLEXITY_LIST <- 10^(-2) * (1:10)
 TUNE_GRID_LIST <- list(
     expand.grid(C = 10^(-3:1),
                 sigma = 10^(-5:-1)), ## svmRadial
