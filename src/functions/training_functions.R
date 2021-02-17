@@ -366,3 +366,15 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
     return (trained_models)
 }
 
+plot_decision_tree <- function (decision_tree_model) {
+
+    png("images/decision_tree_plot.png",
+        res = RES, width = 20, height = 20)
+    fancyRpartPlot(decision_tree_model)
+    dev.off()
+
+    png("images/decision_tree_cp_plot.png",
+        res = RES, width = 20, height = 20)
+    plotcp(decision_tree_model)
+    dev.off()    
+}

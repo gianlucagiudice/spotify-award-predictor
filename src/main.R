@@ -77,12 +77,12 @@ print(paste("Dimension of the dataset for training (rows x columns):",
 
 dataframe <- df.out
 
-## ----------- DA RIMUOVERE -----------
+### ----------- DA RIMUOVERE -----------
 ## df.reduced <- subset(df.out, select = c(661, 662, 666))
 ## df.reduced <- union_all(df.reduced[1:150,], df.reduced[2500:(2500+150),])
 ## colnames(df.reduced) <- make.names(colnames(df.reduced))
 ## dataframe <- df.reduced
-## ----------- DA RIMUOVERE -----------
+### ----------- DA RIMUOVERE -----------
 
 
 ### ------------ Training ------------
