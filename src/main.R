@@ -28,14 +28,11 @@ NUM_CORES = detectCores(logical = TRUE) ## Number of cores to use
 N_FOLDS <- 10 ## Cross validation parameter
 N_REPEATS <- 3
 
-COST_LIST <- 10^(-3:1)
-GAMMA_LIST <- 10^(-5:-1)
-COMPLEXITY_LIST <- 10^(-2) * (1:10) * 1
-
 METHODS_LIST <- list("svmRadial", "svmLinear", "rpart")
 TUNE_GRID_LIST <- list(
-    expand.grid(C = COST_LIST, sigma = GAMMA_LIST), ## svmRadial
-    expand.grid(C = COST_LIST), ##svmlinear
+    expand.grid(C = 10^(-3:1),
+                sigma = 10^(-5:-1)), ## svmRadial
+    expand.grid(C = 10^(-6:1)), ##svmlinear
     NULL) ## rpart
 
 
@@ -64,7 +61,7 @@ print(head(df.principal_components))
 ## Plot categorical feature
 plot_categorical_feature(df, PLOT_GRAPHS)
 
-## Bag of words representation for artists
+## Hot encoding representation for artists
 artists.tf_thld <- build_term_frequency_matrix(df, PLOT_GRAPHS)
 
 ## Build dataframe for training
@@ -99,7 +96,7 @@ for (i in 1:length(METHODS_LIST)){
                        seed = SEED,
                        n_folds = N_FOLDS,
                        num_cores = NUM_CORES)
-    print("------------")
+    print("----------------------")
 }
 
 ### ------- Model comparison -------
@@ -113,3 +110,4 @@ models_statistics <- compare_statistics(dataframe = dataframe,
                                         num_cores = NUM_CORES)
 
 ##compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, N_REPEATS)
+

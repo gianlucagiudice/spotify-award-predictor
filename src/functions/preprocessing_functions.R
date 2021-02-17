@@ -257,7 +257,7 @@ plot_categorical_feature <- function(df, plot_graph) {
         scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
 }
 
-### Bag of words representation for artists
+### Hot encoding representation for artists
 build_term_frequency_matrix <- function(df, plot_graph) {
     artists.df = data.frame(artists = df$artists)
     artists.df$award = df$award

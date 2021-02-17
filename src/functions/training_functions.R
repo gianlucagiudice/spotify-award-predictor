@@ -128,8 +128,7 @@ combine_folds_performance <- function(performance_folds){
     for (i in 1:length(performance_folds)){
         folds = c(folds, list(performance_folds[[i]]$byClass))
     }
-    # TODO: Da cambiare
-    values = matrix(unlist(folds), nrow=11)
+    values = matrix(unlist(folds), nrow=length(folds[[1]]))
     values = rowSums(values) / length(performance_folds)
     return(values)
 }
@@ -334,7 +333,7 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
     
     ## Statistics
     cv.values = resamples(trained_models)
-    summary(cv.values)
+    print(summary(cv.values))
 
     png("images/compare_dot_plot.png",
         res = RES, width = 20, height = 20, units = "cm")
