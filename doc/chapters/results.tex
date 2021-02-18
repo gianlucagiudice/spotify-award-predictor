@@ -44,23 +44,24 @@ TODO: I parametri di cp non sono veri.
 			\multicolumn{1}{c|}{$C$ } &
 			\multicolumn{1}{c|}{$cp$}\\
 			\hline
-			
-			$0.001$	 & $0.00001$    & $0.000001$ & $0.01$\\
-			$0.01$	  & $0.0001$      &$0.00001$	& $0.02$\\
-			$0.1$	   & $0.001$      	&$0.0001$	   & $0.03$\\
-			$1$			& $0.01$      	  &$0.001$		  & $0.04$\\
-			$10$	   & $0.1$      	  &$0.01$		   & $0.05$\\
-				   		   &       	  &$0.1$							   & $0.06$\\
-				   	 	   &       	  &$1$									& $0.07$\\
-				  		   &       	  &$10$								   & $0.08$\\
-						   &       	  &										  & $0.09$\\
-						   &       	  & 									  & $0.10$\\
+			0.001	 & 0.00001    & 0.000001 & \textbf{0.01580381}\\
+			0.01	  & 0.0001      &0.00001	& 0.03487738\\
+			0.1	   & 0.001      	&0.0001	   & 0.17983651\\
+			\textbf{1}			& 0.01      	  &0.001		  & \\
+			10	   &\textbf{ 0.1 }     	  &0.01		   & \\
+			&       		   	     &\textbf{0.1}			   & \\
+			&       	  			 &1				& \\
+			&       	  			 &10			   & \\
+				  		   
 			\hline
 		\end{tabular}
 		
 	\end{center}
 	\caption{Tabella iperparametri utilizzati per grid search.}
 \end{table}
+
+I valori in grassetto nella tabella sono gli iperparametri ottimali.
+Per quanto riguarda il parametro complexity parameter di decision tree, l'insieme dei valori non è stato scelto manualmente.
 
 
 \section{Misure di performance}
