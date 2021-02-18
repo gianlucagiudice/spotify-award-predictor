@@ -1,6 +1,9 @@
 libraries = c("ggplot2", "readr", "GGally", "ggcorrplot", "FactoMineR",
               "wordcloud2", "webshot", "slam", "tidyr", "stringr",
-              "dplyr", "caret", "ROCR", "doParallel")
+              "dplyr", "caret", "ROCR", "doParallel", "factoextra",
+              "htmlwidgets", "tibble")
+
+webshot::install_phantomjs()
 
 if (INSTALL_LIBRARIES){
   installed_libraries = rownames(installed.packages())

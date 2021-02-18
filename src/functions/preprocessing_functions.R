@@ -261,14 +261,13 @@ plot_categorical_feature <- function(df, plot_graph) {
 build_term_frequency_matrix <- function(df, plot_graph) {
     artists.df = data.frame(artists = df$artists)
     artists.df$award = df$award
-    artists.df$row = 1:nrow(artists.df)
-    
     artists.tf =
-        artists.df %>% 
-        mutate(artists=str_split(artists, ",")) %>% 
-        unnest(cols = c(artists)) %>% 
-        mutate(dummy=1) %>% 
-        spread(artists, dummy, fill=0)
+      artists.df %>% 
+      rownames_to_column(var="row") %>% 
+      mutate(artists=str_split(artists, ",")) %>% 
+      unnest(cols = c(artists)) %>% 
+      mutate(dummy=1) %>% 
+      spread(artists, dummy, fill=0)
     artists.tf = subset(artists.tf, select = c(2:ncol(artists.tf)))
     
     artists.occurrence = data.frame(occurrence = colSums(artists.tf[-1]))
