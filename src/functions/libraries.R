@@ -6,9 +6,7 @@ if (INSTALL_LIBRARIES){
   installed_libraries = rownames(installed.packages())
   
   for (library in libraries){
-    print(library)
     if (! (library %in% installed_libraries)){
-      print(library)
       install.packages(library, dependencies = TRUE, character.only = TRUE)
     }
   }
