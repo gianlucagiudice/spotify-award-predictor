@@ -358,7 +358,7 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
 plot_decision_tree <- function (decision_tree_model) {
 
     png("images/decision_tree_plot.png")
-    fancyRpartPlot(decision_tree_model$finalModel)
+    rpart.plot(decision_tree_model$finalModel)
     dev.off()
 
     png("images/decision_tree_cp_plot.png")
