@@ -357,19 +357,23 @@ plot_comparison <- function(models_statistics){
     
     cv.values = resamples(models_statistics)
     
-    png("images/compare_dot_plot.png",
+    png("./images/compare_dot_plot.png",
         res = RES, width = 20, height = 20, units = "cm")
-    dotplot(cv.values, metric = "ROC")
+    print(dotplot(cv.values, metric = "ROC"))
     dev.off()
     
-    png("images/compare_bw_plot.png",
+    png("./images/compare_bw_plot.png",
         res = RES, width = 40, height = 20, units = "cm")
-    bwplot(cv.values, layout = c(3, 1))
+    print(bwplot(cv.values, layout = c(3, 1)))
     dev.off()
 
-    png("images/compare_splom_plot.png",
+    png("./images/compare_splom_plot.png",
         res = RES, width = 20, height = 20, units = "cm")
-    splom(cv.values, metric = "ROC")
+    print(splom(cv.values, metric = "ROC"))
+    dev.off()
+    
+    png("./images/ciao.png")
+    plot(models_statistics$rpart)
     dev.off()
     
 }
