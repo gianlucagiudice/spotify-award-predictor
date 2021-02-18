@@ -3,8 +3,17 @@ libraries = c("ggplot2", "readr", "GGally", "ggcorrplot", "FactoMineR",
               "dplyr", "caret", "ROCR", "doParallel")
 
 if (INSTALL_LIBRARIES){
-  install.packages(libraries, dependencies = TRUE, character.only = TRUE)
+  installed_libraries = rownames(installed.packages())
+  
+  for (library in libraries){
+    print(library)
+    if (! (library %in% installed_libraries)){
+      print(library)
+      install.packages(library, dependencies = TRUE, character.only = TRUE)
+    }
+  }
 }
+
 for (library in libraries){
   library(library, character.only = TRUE)
 }
