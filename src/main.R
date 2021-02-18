@@ -103,4 +103,3 @@ models_statistics <- compare_statistics(dataframe = df.out,
 
 plot_comparison(models_statistics)
 ##compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, N_REPEATS)
-
