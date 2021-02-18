@@ -45,15 +45,13 @@ train_target_model <- function(dataframe, method, tune_grid = NULL,
     
     ## AUC
     probs = Reduce(union_all, training_report[[3]])
-    references = training_report[[4]]
+    references = recode_factor(training_report[[4]],
+                               "1" = NEGATIVE_CLASS_NAME,
+                               "2" = POSITIVE_CLASS_NAME)
     references = resolve_label(dataframe, probs, references)
     ## Positive class
     opt_cut = plot_auc(probs, references, method, POSITIVE_CLASS_NAME)
     print("Optimal cutoff positive class:")
-    print(opt_cut)
-    ## Negative class
-    opt_cut = plot_auc(probs, references, method, NEGATIVE_CLASS_NAME)
-    print("Optimal cutoff negative class:")
     print(opt_cut)
 }
 
@@ -267,19 +265,8 @@ opt.cut = function(perf, pred){
 
 ### Resolve labels
 resolve_label <- function(df, probs, references){
-    label_is_positive <-
-        df[rownames(probs)[1], "award"] == POSITIVE_CLASS_NAME
-    
-    if (label_is_positive & references[1] == "1"){
-        factor_1 = POSITIVE_CLASS_NAME
-        factor_2 = NEGATIVE_CLASS_NAME
-    } else{
-        factor_1 = NEGATIVE_CLASS_NAME
-        factor_2 = POSITIVE_CLASS_NAME
-    }
-    
     references_resolved = recode_factor(
-        references, "1" = factor_1, "2" = factor_2)
+        references, "1" = NEGATIVE_CLASS_NAME, "2" = POSITIVE_CLASS_NAME)
     
     return(references_resolved)
 }

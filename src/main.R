@@ -1,7 +1,7 @@
 ### ------- Load custom functions -------
 INSTALL_LIBRARIES <- TRUE
 DUMP_MODEL <- TRUE
-TRAIN_MODEL <- TRUE
+TRAIN_MODEL <- FALSE
 PLOT_GRAPHS <- FALSE
 
 source('src/functions/libraries.R')
@@ -74,15 +74,6 @@ df.out = build_out_dataframe(artists.tf_thld,
 print(paste("Dimension of the dataset for training (rows x columns):",
             dim(df.out)[1], dim(df.out)[2]))
 
-dataframe <- df.out
-
-### ----------- DA RIMUOVERE -----------
-## df.reduced <- subset(df.out, select = c(661, 662, 666))
-## df.reduced <- union_all(df.reduced[1:150,], df.reduced[2500:(2500+150),])
-## colnames(df.reduced) <- make.names(colnames(df.reduced))
-## dataframe <- df.reduced
-### ----------- DA RIMUOVERE -----------
-
 
 ### ------------ Training ------------
 print("=========== MODELS TRAINING START ===========")
@@ -91,7 +82,7 @@ for (i in 1:length(METHODS_LIST)){
     tune_grid <- TUNE_GRID_LIST[[i]]
     
     print(paste(">>>", method))
-    train_target_model(dataframe = dataframe,
+    train_target_model(dataframe = df.out,
                        method = method,
                        tune_grid = tune_grid,
                        seed = SEED,
@@ -102,7 +93,7 @@ for (i in 1:length(METHODS_LIST)){
 
 ### ------- Model comparison -------
 print("=========== START COMPARISON ===========")
-models_statistics <- compare_statistics(dataframe = dataframe,
+models_statistics <- compare_statistics(dataframe = df.out,
                                         methods_list = METHODS_LIST,
                                         tune_grid_list = TUNE_GRID_LIST,
                                         seed = SEED,
