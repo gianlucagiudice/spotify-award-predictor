@@ -1,7 +1,7 @@
 libraries = c("ggplot2", "readr", "GGally", "ggcorrplot", "FactoMineR",
               "wordcloud2", "webshot", "slam", "tidyr", "stringr",
               "dplyr", "caret", "ROCR", "doParallel", "factoextra",
-              "htmlwidgets", "tibble")
+              "htmlwidgets", "tibble", "rattle")
 
 webshot::install_phantomjs()
 
