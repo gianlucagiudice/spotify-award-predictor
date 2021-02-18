@@ -236,7 +236,8 @@ plot_categorical_feature <- function(df, plot_graph) {
         scale_y_continuous(breaks = seq(0, 2000, by = 100)) +
         theme(plot.title = element_text(hjust = 0.5))
     ggsave("explicit_distribution.png", plot = last_plot(), path = "images",
-           scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
+           scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE,
+           height=30, width=30, units="cm")
 
     ## Mode feature
     ggplot(data=df, aes(mode, fill=factor(award))) +
@@ -245,7 +246,8 @@ plot_categorical_feature <- function(df, plot_graph) {
     scale_y_continuous(breaks = seq(0, 1300, by = 100)) +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("mode_distribution.png", plot = last_plot(), path = "images",
-        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE,
+        height=30, width=30, units="cm")
 
     ## Key feature
     ggplot(data=df, aes(key, fill=factor(award))) +
@@ -254,7 +256,8 @@ plot_categorical_feature <- function(df, plot_graph) {
     scale_y_continuous(breaks = seq(0, 300, by = 20)) +
     theme(plot.title = element_text(hjust = 0.5))
     ggsave("key_distribution.png", plot = last_plot(), path = "images",
-        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE)
+        scale = SCALE / 2, dpi = floor(DPI), limitsize = TRUE,
+        height=30, width=50, units="cm")
 }
 
 ### Hot encoding representation for artists

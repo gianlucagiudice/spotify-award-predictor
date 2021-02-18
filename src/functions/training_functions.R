@@ -344,17 +344,6 @@ plot_decision_tree <- function (decision_tree_model) {
 }
 
 plot_comparison <- function(models_statistics){
-    if(FALSE){
-    statistics = list()
-    for (method in methods_list){
-        statistics[[method]] = trained_models[[method]]
-    }
-    
-    statistics = list(rpart = trained_models$rpart,
-                      svmLinear = trained_models$svmLinear,
-                      svmRadial = trained_models$svmRadial)
-    }
-    
     cv.values = resamples(models_statistics)
     
     png("./images/compare_dot_plot.png",
