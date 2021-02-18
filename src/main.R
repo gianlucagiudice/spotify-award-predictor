@@ -11,7 +11,7 @@ source('src/functions/training_functions.R')
 ### ------------- Constants --------------
 DPI <- 300
 SCALE <- 0.75
-RES <- 1800
+RES <- 400
 
 POSITIVE_CLASS_NAME = "award"
 NEGATIVE_CLASS_NAME = "not_award"

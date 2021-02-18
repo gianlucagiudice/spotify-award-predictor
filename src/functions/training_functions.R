@@ -372,7 +372,7 @@ plot_comparison <- function(models_statistics){
     print(splom(cv.values, metric = "ROC"))
     dev.off()
     
-    png("./images/rpart_cp.png")
+    png("./images/rpart_cp_plot.png")
     print(plot(models_statistics$rpart))
     dev.off()
     
