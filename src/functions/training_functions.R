@@ -331,6 +331,11 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
         load(filename)
     }
     
+    ## Info
+    print("---- Statisticts info -----")
+    print(trained_models)
+    print("---------------------------")
+    
     ## Statistics
     cv.values = resamples(trained_models)
     print(summary(cv.values))
