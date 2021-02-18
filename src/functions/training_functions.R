@@ -324,7 +324,7 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
     print("---------------------------")
     
     ## Statistics
-    cv.values = resamples(statistics)
+    cv.values = resamples(trained_models)
     print(summary(cv.values))
     
     print(cv.values$timings)
@@ -372,8 +372,8 @@ plot_comparison <- function(models_statistics){
     print(splom(cv.values, metric = "ROC"))
     dev.off()
     
-    png("./images/ciao.png")
-    plot(models_statistics$rpart)
+    png("./images/rpart_cp.png")
+    print(plot(models_statistics$rpart))
     dev.off()
     
 }
