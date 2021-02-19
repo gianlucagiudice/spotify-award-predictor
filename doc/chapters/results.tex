@@ -71,32 +71,59 @@ tree, l'insieme dei valori non è stato scelto manualmente.
 Le misure di performance sono state ottenute combinando i risultati
 ottenuti dalla 10-fold cross validation per ogni fold sia per la
 classe positiva che per la classe negativa facendo la macro average
-delle misure cercate.
+delle misure cercate. Le misure considerate sono:
 
-\subsection{Accuracy}
-L'accuracy é definita come il numero di veri positivi e veri negativi
-rapportati al numero di esempi totali.
+\begin{description}
+\item [Accuracy] L'accuracy é definita come il numero di veri positivi
+  e veri negativi rapportati al numero di esempi totali.
 
-Per i modelli esaminati abbiamo ottenuto:
+\item [Precision] La precision é definita come il numero di veri
+  positivi rapportati al numero totale di predizioni positive.
 
-\subsection{Precision}
-La precision é definita come il numero di veri positivi rapportati al
-numero totale di predizioni positive.
+\item [Recall] La misura di recall é definita come il numero di veri
+  positivi rapportati al numero di veri positivi e falsi negativi.
 
-Per i modelli esaminati abbiamo ottenuto:
-\subsection{Recall}
-La misura di recall é definita come il numero di veri positivi
-rapportati al numero di veri positivi e falsi negativi.
+\item [F-measure] La F-Measure é definita come la media armonica di
+  precision e sensitivity.
+\end{description}
 
-Per i modelli esaminati abbiamo ottenuto:
-\subsection{F-measure}
-La F-Measure é definita come la media armonica di precision e
-sensitivity.
-
-Per i modelli esaminati abbiamo ottenuto:
 \subsection{Curve ROC e AUC}
 
+\begin{figure}[H]
+	  \subfloat[SVM - RBF.]{
+	\begin{minipage}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=7cm]{../images/svmRadial_award_auc.png}
+\end{minipage}}
+\hfill 	
+\subfloat[SVM - Linear.]{
+	\begin{minipage}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=7cm]{../images/svmLinear_award_auc.png}
+\end{minipage}}
+
+\subfloat[Decision tree.]{
+	\begin{minipage}[c]{\textwidth}
+		\centering
+		\includegraphics[width=7cm]{../images/rpart_award_auc.png}
+\end{minipage}}
+
+\caption{Curve ROC e AUC dei modelli.}
+
+Dalle curve ROC e la misura di AUC é possibile rendersi conto che i
+classificatori non sono molto efficaci, un valore di AUC di 0.5
+significa che il nostro classificatore ha le stesse capacitá
+predittive di un classificatore che classifica in maniera casuale. Il
+classificatore migliore risulta essere la support vecotor machine con
+kernel radiale mentre il peggiore risulta essere il decision tree
+ottenuto tramite rpart.
+\end{figure}
+
 \section{Support Vector Machine}
+\subsection{Scelta del modello}
+Support vector machine é stato scelto perché boh generalmente le smv
+funzionano bene.é
+
 \subsection{Kernel}
 
 \section{Decision Tree} \subsection{Scelta del modello} Come secondo
@@ -245,8 +272,12 @@ allenata con kernel radiale e una svm allenata con kernel lineare.
 	\label{fig:compare_splom_plot}
 \end{figure}
 
+Il modello migliore risulta essere la SVM con kernel radiale.
+
 \subsection{Confronto Timings} Il modello support vector machine
-risulta più lento per quanto riguarda i tempi di training, soprattuto se viene utilizzato il kernel radial basis function. Decision tree è quello più veloce.
+risulta più lento per quanto riguarda i tempi di training, soprattuto
+se viene utilizzato il kernel radial basis function. Decision tree è
+quello più veloce.
 
 \begin{table}[H]
 	\begin{center}
@@ -263,4 +294,8 @@ risulta più lento per quanto riguarda i tempi di training, soprattuto se viene 
 	\caption{Tempi per il training dei modelli.}
 \end{table}
 
-I tempi di training in tabella sono espressi in secondi. La colonna Everything si riferisce al training con la tecnica 10-fold cross validation mentre final model indica il training del modello utilizzando tutto il dataset. Per la fase di training vengono sfruttati più cores in modo tale da ridurre i tempi di training.
+I tempi di training in tabella sono espressi in secondi. La colonna
+Everything si riferisce al training con la tecnica 10-fold cross
+validation mentre final model indica il training del modello
+utilizzando tutto il dataset. Per la fase di training vengono
+sfruttati più cores in modo tale da ridurre i tempi di training.
