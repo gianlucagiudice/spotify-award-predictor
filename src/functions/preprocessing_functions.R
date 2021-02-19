@@ -287,7 +287,7 @@ build_term_frequency_matrix <- function(df, plot_graph) {
             theme(axis.text.x = element_text(angle = 90),
                   plot.title = element_text(hjust = 0.5))
         ggsave("artists_occurence.png", plot = last_plot(), path = "images",
-               scale = SCALE / 1.5, dpi = DPI, limitsize = TRUE)
+               scale = SCALE / 1, dpi = DPI, limitsize = TRUE)
     }
     
 
