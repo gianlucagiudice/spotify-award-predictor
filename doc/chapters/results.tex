@@ -1,6 +1,7 @@
 \chapter{Campagna sperimentale}
 
 \section{Approccio}
+
 \subsection{10-folds cross validation}
 Per la fase di training dei modelli viene utilizzata la tecnica k-folds cross validation. Si procede quindi creando una partizione del dataset iniziale, dove ogni sottoinsieme, ovvero un fold, ha circa lo stesso numero di istanze ed è più o meno bilanciato tra la classe positiva e negativa.
 
@@ -104,6 +105,45 @@ ragionevole rispetto alla potenza computazionale in nostro possesso.
 
 \subsection{Complexity Parameter}
 \subsection{Decision Tree Plot}
+\subsection{Risultati esperimenti}
+
+
+\begin{table}[H]
+	\begin{center}
+		\begin{tabular}{ | l | c | c | c | c |  c | c |}
+			\hline
+			& \textbf{Precision+} & \textbf{Recall+} &\textbf{ F1+ }	& \textbf{Precision-} &\textbf{ Recall-} & \textbf{F1-} \\
+			\hline
+			\textbf{SVM - RBF} & 0.59860 & 0.67530  & 0.63313 &
+												    0.63433 & 0.55098 & 0.58766\\
+			\textbf{SVM - Linear} & 0.59600 & 0.73135 & 0.65625&
+													0.65406 & 0.50413 & 0.56872\\
+			\textbf{Decision tree} & 0.56467&  0.84469 & 0.67633 & 
+										0.69437 & 0.34724 & 0.45957 \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Confronto performance dei modelli distinguendo tra classe positiva e negativa.}
+\end{table}
+
+
+
+
+\begin{table}[H]
+	\begin{center}
+		\begin{tabular}{ | l | c | c | c | c |  c |}
+			\hline
+			& \textbf{Accuracy} & \textbf{Precision} &\textbf{ Recall }	& \textbf{F1} &\textbf{ AUC} \\
+			\hline
+			\textbf{SVM - RBF} & 0.61309 & 0.61640 & 0.61139  & 0.61800 & 0.66106 \\
+			\textbf{SVM - Linear} & 0.61771 & 0.62503 & 0.61774 & 0.62136 & 0.65601 \\
+			\textbf{Decision tree} & 0.59592 & 0.62921 & 0.59571 	& 0.61285 & 0.59734\\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Confronto performance dei modelli (macro average).}
+\end{table}
+
 
 \section{Modelli a confronto}
 Sono stati messi a confronto i modelli di decision tree, di svm
@@ -113,27 +153,41 @@ allenata con kernel radiale e una svm allenata con kernel lineare.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=13cm]{../images/compare_dot_plot_fix.png}
+	\includegraphics[width=13cm]{../images/compare_dot_plot.png}
 	\caption{Dotplot per metrica ROC.}
 	\label{fig:compare_dot_plot}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=13cm]{../images/compare_bw_plot_fix.png}
+	\includegraphics[width=13cm]{../images/compare_bw_plot.png}
 	\caption{Dotplot per metrica ROC.}
 	\label{fig:compare_bw_plot}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=13cm]{../images/compare_splom_plot_fix.png}
+	\includegraphics[width=13cm]{../images/compare_splom_plot.png}
 	\caption{Scatter plot per metrica ROC.}
 	\label{fig:compare_splom_plot}
 \end{figure}
 
 \subsection{Confronto Timings} Il modello support vector machine
-risulta piu lento per quanto riguarda i tempi di training.
+risulta più lento per quanto riguarda i tempi di training, soprattuto se viene utilizzato il kernel radial basis function. Decision tree è quello più veloce.
 
-TODO
-Tabella con i timings
+\begin{table}[H]
+	\begin{center}
+		\begin{tabular}{ | l | c | c |}
+			\hline
+			& \textbf{Everything} & \textbf{Final model} \\
+			\hline
+			\textbf{SVM - RBF kernel} & 1286.484  & 43.524 \\
+			\textbf{SVM - Linear kernel} & 666.136 & 34.730 \\
+			\textbf{Decision tree} & 16.049 & 0.884  \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Tempi per il training dei modelli.}
+\end{table}
+
+I tempi di training in tabella sono espressi in secondi. La colonna Everything si riferisce al training con la tecnica 10-fold cross validation mentre final model indica il training del modello utilizzando tutto il dataset. Per la fase di training vengono sfruttati più cores in modo tale da ridurre i tempi di training.

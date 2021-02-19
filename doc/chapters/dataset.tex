@@ -276,23 +276,23 @@ Sotto viene riportata una tabella riassuntiva riguardo il numero di istanze nel 
 \begin{table}[H]
 	
 	\begin{center}
+		
+		\begin{tabular}{ |l|c| }
+			\hline
+			\multicolumn{1}{ |c }{\textbf{DATASET}} &
+			\multicolumn{1}{ c |}{\textbf{\# ISTANZE}} \\
+			\hline
+			\hline
+			Dataset completo & 
+			$151762$\\
+			Dataset ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
+			$26134$\\
+			Dataset bilanciato ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
+			$3670$\\
+			\hline
+		\end{tabular}
 	
-	\begin{tabular}{ |l|c| }
-		\hline
-		\multicolumn{1}{ |c }{\textbf{DATASET}} &
-		\multicolumn{1}{ c |}{\textbf{\# ISTANZE}} \\
-		\hline
-		\hline
-		Dataset completo & 
-		$151762$\\
-		Dataset ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
-		$26134$\\
-		Dataset bilanciato ($release\_date \geq 2005 \; \& \; popularity > 25 $)  & 
-		$3670$\\
-		\hline
-	\end{tabular}
-	
-\end{center}
+	\end{center}
 	\caption{Numero di istanze nel dataset.}
 \end{table}
 		
@@ -406,7 +406,7 @@ Di seguito si esplorano le variabili categoriche del dataset, distinguendo tra c
 
 	\begin{subfigure}[b]{\textwidth}
 		\centering
-		\includegraphics[width=10cm]{../images/key_distribution.png}
+		\includegraphics[width=13cm]{../images/key_distribution.png}
 		\caption{Variabile key.}
 	\end{subfigure}
       
@@ -417,7 +417,7 @@ Di seguito si esplorano le variabili categoriche del dataset, distinguendo tra c
 		\caption{Variabile mode.}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.58\textwidth}
+	\begin{subfigure}[b]{0.6\textwidth}
 		\centering
 		\includegraphics[width=10cm]{../images/explicit_distribution.png}
 		\caption{Variabile explicit.}
