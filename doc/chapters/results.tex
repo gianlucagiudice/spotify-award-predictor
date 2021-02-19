@@ -88,17 +88,18 @@ delle misure cercate. Le misure considerate sono:
 
 
 \section{Support Vector Machine}
-\subsection{Scelta del modello}
-Support vector machine é stato scelto perché boh generalmente le smv
-funzionano bene.é
+Il primo algoritmo scelto è support vector machine. Nello specifico sono stati utilizzati due diversi kernel per poi confrontarne le prestazioni. I kernel utilizzati 
+sono:
+\begin{itemize}
+	\item Lineare
+	\item Radial basisi function
+\end{itemize}
 
-\subsection{Kernel}
-
-\section{Decision Tree} \subsection{Scelta del modello} Come secondo
-modello parte del progetto é stato scelto un albero di decisione
+\section{Decision Tree} \subsection{Scelta del modello} 
+Come secondo algoritmo di apprendimento é stato scelto un albero di decisione
 (decision tree/classification tree). Questo perché anche con un
 dataset relativamente ampio permette il training in un tempo
-ragionevole rispetto alla potenza computazionale in nostro possesso.
+ragionevole rispetto alla potenza computazionale in nostro possesso. Inoltre un albero di decisione è facilmente interpretabile, infatti permette di analizzare su quale base vengono prese le decisioni.
 
 \subsection{Decision Tree Plot}
 Il decision tree ottenuto è molto semplice, questo è dovuto al valore
@@ -107,10 +108,9 @@ la feature più significativa, ovvero dove decision tree effettua lo split, risu
 essere la componente principale ottenuta con la tecnica di principal
 component analysis.
 
-
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=7cm,trim={2.5cm 2.5cm 2.5cm 2.5cm}, clip]{../images/rpart_plot.png}
+	\includegraphics[width=6cm,trim={2.5cm 2.5cm 2.5cm 2.5cm}, clip]{../images/rpart_plot.png}
 	\caption{Decision tree plot.}
 	\label{fig:decision_tree_plot}
 \end{figure}
@@ -194,6 +194,8 @@ Dal grafico emerge che i modelli SVM sono piuttosto simili tra loro. Per quanto 
 	\end{subfigure}
 	\caption{Performance dei modelli (macro average).}
 \end{figure}
+
+Come si può notare dai grafici, le performance sono piuttosto simili tra i tre modelli.
 
 
 \subsubsection{Curve ROC e AUC}
@@ -329,7 +331,7 @@ Dall'immagine sopra possiamo notare come fissato un intervallo di confidenza ugu
 	\label{fig:compare_splom_plot}
 \end{figure}
 
-Come spiegato in precedentemente, il confronto viene effettuato
+Come spiegato precedentemente, il confronto viene effettuato
 eseguendo per 3 volte una 10-folds cross validation. Quindi alla fine
 si ottengono 30 stime di performance per ogni modello, ognuna delle
 quali è il risultato del training di uno specifico fold. In
