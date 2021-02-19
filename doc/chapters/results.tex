@@ -3,13 +3,28 @@
 \section{Approccio}
 
 \subsection{10-folds cross validation}
-Per la fase di training dei modelli viene utilizzata la tecnica k-folds cross validation. Si procede quindi creando una partizione del dataset iniziale, dove ogni sottoinsieme, ovvero un fold, ha circa lo stesso numero di istanze ed è più o meno bilanciato tra la classe positiva e negativa.
+Per la fase di training dei modelli viene utilizzata la tecnica
+k-folds cross validation. Si procede quindi creando una partizione del
+dataset iniziale, dove ogni sottoinsieme, ovvero un fold, ha circa lo
+stesso numero di istanze ed è più o meno bilanciato tra la classe
+positiva e negativa.
 
-Per gli esperimenti effettuati, è stato scelto $k = 10$, ovvero il dataset viene diviso casualemnte in 10 parti, utilizzando ad ogni iterazioni una porzione di dati diversa per il trainig-set e test-set. Avendo scelto questo valore di k, la proporzione tra i due insiemi sarà sempre 90\% per il training-set e 10\% per il test-set.
+Per gli esperimenti effettuati, è stato scelto $k = 10$, ovvero il
+dataset viene diviso casualmente in 10 parti, utilizzando ad ogni
+iterazioni una porzione di dati diversa per il trainig-set e
+test-set. Avendo scelto questo valore di k, la proporzione tra i due
+insiemi sarà sempre 90\% per il training-set e 10\% per il test-set.
 
-Per ogni modello si vogliono testare diversi iperparametri (\autoref{sec:mode_selection}), pertanto ad ogni iterazione della 10-folds, fissato un fold per il training $\hat{F}$, si esegue un'altra 10-fold cross validation più interna su $\hat{F}$  ($90\%$ del dataset totale), così da poter scegliere l'iperparametro migliore.
+Per ogni modello si vogliono testare diversi iperparametri
+(\autoref{sec:mode_selection}), pertanto ad ogni iterazione della
+10-folds, fissato un fold per il training $\hat{F}$, si esegue
+un'altra 10-fold cross validation più interna su $\hat{F}$ ($90\%$ del
+dataset totale), così da poter scegliere l'iperparametro migliore.
 
-Procedendo in questo modo l'ottimizzazione degli iperparametri viene effettuata sfruttando solo il training set e il test set non viene utilizzato nè per il training nè per la scelta degli iperparametri ottimali.
+Procedendo in questo modo l'ottimizzazione degli iperparametri viene
+effettuata sfruttando solo il training set e il test set non viene
+utilizzato nè per il training nè per la scelta degli iperparametri
+ottimali.
 
 \begin{figure}[H]
 	\centering
@@ -17,15 +32,25 @@ Procedendo in questo modo l'ottimizzazione degli iperparametri viene effettuata 
 	\caption{Nested 3-folds cross validation.}
 \end{figure}
 
-Una nota importante è che i 10 folds vengono generati in modo casuale, tuttavia per ogni modello di cui si vuole fare il training, questa generazione casuale viene effettuata a per mezzo dello stesso seed. Questo garatisce di avere folds generati casualmente ma in modo idenctico per ogni modello, in questo modo si ottengono dei risultati statisticamente validi.
+Una nota importante è che i 10 folds vengono generati in modo casuale,
+tuttavia per ogni modello di cui si vuole fare il training, questa
+generazione casuale viene effettuata a per mezzo dello stesso
+seed. Questo garatisce di avere folds generati casualmente ma in modo
+identico per ogni modello, in questo modo si ottengono dei risultati
+statisticamente validi.
 
 \subsection{Model selection}
 \label{sec:mode_selection}
-Come abbiamo sopra discusso, per ogni modello viene effettuato il tuning degli iperparametri usando la tecnica 10-folds cross validation.
+Come abbiamo sopra discusso, per ogni modello viene effettuato il
+tuning degli iperparametri usando la tecnica 10-folds cross
+validation.
 
 \subsubsection{Grid search}
 \label{sec:grid-search}
-Per determinare gli iperparametri ottimali, vengono scelti un insieme di parametri da utilizzare per la fase di training dei modelli. Per ogni modello si considerando tutte le combinazioni dei valori scelti per i parametri.
+Per determinare gli iperparametri ottimali, vengono scelti un insieme
+di parametri da utilizzare per la fase di training dei modelli. Per
+ogni modello si considerando tutte le combinazioni dei valori scelti
+per i parametri.
 
 \begin{table}[H]
 	
@@ -96,17 +121,20 @@ sono:
 \end{itemize}
 
 \section{Decision Tree} \subsection{Scelta del modello} 
-Come secondo algoritmo di apprendimento é stato scelto un albero di decisione
-(decision tree/classification tree). Questo perché anche con un
-dataset relativamente ampio permette il training in un tempo
-ragionevole rispetto alla potenza computazionale in nostro possesso. Inoltre un albero di decisione è facilmente interpretabile, infatti permette di analizzare su quale base vengono prese le decisioni.
+Come secondo algoritmo di apprendimento é stato scelto un albero di
+decisione (decision tree/classification tree). Questo perché anche con
+un dataset relativamente ampio permette il training in un tempo
+ragionevole rispetto alla potenza computazionale in nostro
+possesso. Inoltre un albero di decisione è facilmente interpretabile,
+infatti permette di analizzare su quale base vengono prese le
+decisioni.
 
 \subsection{Decision Tree Plot}
 Il decision tree ottenuto è molto semplice, questo è dovuto al valore
-ottimale del complexity parameter. Si noti come utilizzando questo algoritmo
-la feature più significativa, ovvero dove decision tree effettua lo split, risulta
-essere la componente principale ottenuta con la tecnica di principal
-component analysis.
+ottimale del complexity parameter. Si noti come utilizzando questo
+algoritmo la feature più significativa, ovvero dove decision tree
+effettua lo split, risulta essere la componente principale ottenuta
+con la tecnica di principal component analysis.
 
 \begin{figure}[H]
 	\centering
@@ -209,7 +237,8 @@ Come si può notare dai grafici, le performance sono piuttosto simili tra i tre 
 
 
 \subsubsection{Curve ROC e AUC}
-Viene ora analizzata la curva ROC per la classe positiva (award) e la relativa area sotto la curva.
+Viene ora analizzata la curva ROC per la classe positiva (award) e la
+relativa area sotto la curva (AUC).
 
 \begin{figure}[H]
 	\subfloat[SVM - RBF.]{
@@ -332,7 +361,12 @@ statisticamente valida.
 	\caption{Intervalli di confidenza metrica ROC.}
 	\label{fig:compare_dot_plot}
 \end{figure}
-Dall'immagine sopra possiamo notare come fissato un intervallo di confidenza uguale a 0.95, l'intereszione tra i valori è vuota per ogni coppia di modelli. Possiamo quindi concludere con una confidenza al 95\% che, basandosi sulla metrica ROC, il modello SVM con kernel radial basis function ottiene le performance migliori. Questo si paga in termini di complessità del modello e tempo per il training.
+Dall'immagine sopra possiamo notare come fissato un intervallo di
+confidenza uguale a 0.95, l'intereszione tra i valori è vuota per ogni
+coppia di modelli. Possiamo quindi concludere con una confidenza al
+95\% che, basandosi sulla metrica ROC, il modello SVM con kernel
+radial basis function ottiene le performance migliori. Questo si paga
+in termini di complessità del modello e tempo per il training.
 
 \begin{figure}[H]
 	\centering
