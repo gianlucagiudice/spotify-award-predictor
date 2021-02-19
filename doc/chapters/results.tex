@@ -55,10 +55,11 @@ TODO: I parametri di cp non sono veri.
 			&       	  			 &10			   & \\
 				  		   
 			\hline
+			
+			\label{tab:iperp}
 		\end{tabular}
 		
 	\end{center}
-	\label{tab:iperparametri}
 	\caption{Tabella iperparametri utilizzati per grid search.}
 \end{table}
 
@@ -87,37 +88,6 @@ delle misure cercate. Le misure considerate sono:
   precision e sensitivity.
 \end{description}
 
-\subsection{Curve ROC e AUC}
-
-\begin{figure}[H]
-	  \subfloat[SVM - RBF.]{
-	\begin{minipage}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=7cm]{../images/svmRadial_award_auc.png}
-\end{minipage}}
-\hfill 	
-\subfloat[SVM - Linear.]{
-	\begin{minipage}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=7cm]{../images/svmLinear_award_auc.png}
-\end{minipage}}
-
-\subfloat[Decision tree.]{
-	\begin{minipage}[c]{\textwidth}
-		\centering
-		\includegraphics[width=7cm]{../images/rpart_award_auc.png}
-\end{minipage}}
-
-\caption{Curve ROC e AUC dei modelli.}
-
-Dalle curve ROC e la misura di AUC é possibile rendersi conto che i
-classificatori non sono molto efficaci, un valore di AUC di 0.5
-significa che il nostro classificatore ha le stesse capacitá
-predittive di un classificatore che classifica in maniera casuale. Il
-classificatore migliore risulta essere la support vecotor machine con
-kernel radiale mentre il peggiore risulta essere il decision tree
-ottenuto tramite rpart.
-\end{figure}
 
 \section{Support Vector Machine}
 \subsection{Scelta del modello}
@@ -142,7 +112,7 @@ component analysis.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=8cm,trim={2.5cm 2.5cm 2.5cm 2.5cm}, clip]{../images/rpart_plot.png}
+	\includegraphics[width=7cm,trim={2.5cm 2.5cm 2.5cm 2.5cm}, clip]{../images/rpart_plot.png}
 	\caption{Decision tree plot.}
 	\label{fig:decision_tree_plot}
 \end{figure}
@@ -152,15 +122,14 @@ Il complexity parameter influisce direttamente sulla complessità
 dell'albero. In questo senso per complessità si fa riferimento alla
 VC-dimension, ciò si riflette direttamente sulla struttura
 dell'albero. Nel caso preso in esame vengono considerati differenti
-valori per il complexity parameter (elencati in
-\autopageref{tab:iperparametri}).
+valori per il complexity parameter (elencati in \autoref{tab:iperp}).
 
 Nell'immagine seguente vengono mostrate le differenti performance
 dell'albero, utilizzando la metrica ROC, al variare del complexity
 parameter.
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=8cm]{../images/rpart_cp_plot.png}
+	\includegraphics[width=7cm]{../images/rpart_cp_plot.png}
 	\caption{Complexity parameter plot.}
 	\label{fig:cp_plot}
 \end{figure}
@@ -189,6 +158,8 @@ parameter.
 \caption{Performance dei modelli distinguendo tra classe positiva e negativa.}
 \end{figure}
 
+
+
 \subsubsection{Performance macro average}
 \begin{figure}[H]
 	\centering
@@ -208,6 +179,68 @@ parameter.
 \end{figure}
 
 
+\subsubsection{Curve ROC e AUC}
+Viene ora analizzata la curva ROC per la classe positiva (award) e la relativa area sotto la curva.
+
+\begin{figure}[H]
+	\subfloat[SVM - RBF.]{
+		\begin{minipage}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=7cm]{../images/svmRadial_award_auc.png}
+	\end{minipage}}
+	\hfill 	
+	\subfloat[SVM - Linear.]{
+		\begin{minipage}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=7cm]{../images/svmLinear_award_auc.png}
+	\end{minipage}}
+	
+	\subfloat[Decision tree.]{
+		\begin{minipage}[c]{\textwidth}
+			\centering
+			\includegraphics[width=7cm]{../images/rpart_award_auc.png}
+	\end{minipage}}
+	
+	\caption{Curve ROC e AUC dei modelli.}
+	
+\end{figure}
+
+Dalle curve ROC e la misura di AUC é possibile rendersi conto che i
+classificatori non sono molto efficaci, un valore di AUC di 0.5
+significa che il nostro classificatore ha le stesse capacitá
+predittive di un classificatore che classifica in maniera casuale. Il
+classificatore migliore risulta essere la support vecotor machine con
+kernel radiale mentre il peggiore risulta essere il decision tree
+ottenuto tramite rpart.
+
+Un altro aspetto interessante è il fatto che la curva ROC mostra il rapporto dei falsi positivi e il rapporto dei veri positivi al variare del cutoff scelto. Questo permette di scegliere un cutoff in modo tale da bilanciare i falsi positivi e veri negativi secondo le esigenze di dominio.
+
+Viene qui mostrata l'accuracy dei modelli al variare del cutoff:
+
+\begin{figure}[H]
+	\subfloat[SVM - RBF.]{
+		\begin{minipage}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=7cm]{../images/svmRadial_award_cutoff_auc.png}
+	\end{minipage}}
+	\hfill 	
+	\subfloat[SVM - Linear.]{
+		\begin{minipage}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=7cm]{../images/svmLinear_award_cutoff_auc.png}
+	\end{minipage}}
+	
+	\subfloat[Decision tree.]{
+		\begin{minipage}[c]{\textwidth}
+			\centering
+			\includegraphics[width=7cm]{../images/rpart_award_cutoff_auc.png}
+	\end{minipage}}
+	
+	\caption{Accuracy dei modelli al variare del cutoff.}
+	
+\end{figure}
+
+\subsubsection{Tabelle riassuntive performance}
 \begin{table}[H]
 	\begin{center}
 		\begin{tabular}{ | l | c | c | c | c |  c | c |}
@@ -246,38 +279,37 @@ parameter.
 
 
 \section{Modelli a confronto}
-Sono stati messi a confronto i modelli di decision tree, di svm
-allenata con kernel radiale e una svm allenata con kernel lineare.
+\label{sec:modelli_confronto}
+Per confrontare i modelli viene utilizzata la tecnica 10-folds cross validation con 3 ripetizioni. Questo vuol dire ripetere la 10-folds cross validation per 3 volte generando folds differenti. Con questa tecnica si ottenengono stime di performance più accurate, a discapito dei tempi di training. 
+
+Un aspetto importante è che i folds vengono generati in modo identico per il training di ogni modello. In questo modo è possibile mettere a confronto le performance ottenute da ogni modelli in maniera statisticamente valida.
 
 \subsection{Confronto secondo metrica ROC}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=13cm]{../images/compare_dot_plot.png}
-	\caption{Dotplot per metrica ROC.}
+	\includegraphics[width=7cm]{../images/compare_dot_plot.png}
+	\caption{Intervalli di confidenza metrica ROC.}
 	\label{fig:compare_dot_plot}
 \end{figure}
+Dall'immagine sopra possiamo notare come fissato un intervallo di confidenza uguale a 0.95, l'intereszione tra i valori è vuota per ogni coppia di modelli. Possiamo quindi concludere con una confidenza al 95\% che, basandosi sulla metrica ROC, il modello SVM con kernel radial basis function ottiene le performance migliori. Questo si paga in termini di complessità del modello e tempo per il training.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=13cm]{../images/compare_bw_plot.png}
-	\caption{Dotplot per metrica ROC.}
-	\label{fig:compare_bw_plot}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=13cm]{../images/compare_splom_plot.png}
+	\includegraphics[width=7cm]{../images/compare_splom_plot.png}
 	\caption{Scatter plot per metrica ROC.}
 	\label{fig:compare_splom_plot}
 \end{figure}
 
-Il modello migliore risulta essere la SVM con kernel radiale.
+Come spiegato in precedentemente, il confronto viene effettuato eseguendo per 3 volte una 10-folds cross validation. Quindi alla fine si ottengono 30 stime di performance per ogni modello, ognuna delle quali è il risultato del training di uno specifico fold. In \autoref{fig:compare_dot_plot} vengono mostate le stime di performance utilizzando ognuno dei 30 folds. In modo coerente a quanto visto in \autoref{fig:compare_splom_plot} notiamo che SVM con kernel rbf è decisamente meglio a decision tree, infatti praticamente per ogni fold ottiene performance migliori. Anche per quanto riguarda il confronto tra SVM con kernel rbf e lineare, il modello con kernel rbf ottiene performance migliori sulla maggior parte dei folds. Nel caso in cui avessimo avuto due modelli con i 30 folds distribuiti sulla bisetrice di un quadrante, in quel caso i modelli sarebbero stati identici.
 
-\subsection{Confronto Timings} Il modello support vector machine
-risulta più lento per quanto riguarda i tempi di training, soprattuto
-se viene utilizzato il kernel radial basis function. Decision tree è
-quello più veloce.
+\subsection{Confronto Timings}
+Di seguito vengono mostrati i tempi di training per i modelli (espressi in secondi).
+La colonna
+Everything si riferisce al training con la tecnica 10-fold cross
+validation mentre final model indica il training del modello
+utilizzando tutto il dataset. Per la fase di training vengono
+sfruttati più cores in modo tale da ridurre i tempi di training.
 
 \begin{table}[H]
 	\begin{center}
@@ -294,8 +326,9 @@ quello più veloce.
 	\caption{Tempi per il training dei modelli.}
 \end{table}
 
-I tempi di training in tabella sono espressi in secondi. La colonna
-Everything si riferisce al training con la tecnica 10-fold cross
-validation mentre final model indica il training del modello
-utilizzando tutto il dataset. Per la fase di training vengono
-sfruttati più cores in modo tale da ridurre i tempi di training.
+Il modello support vector machine
+risulta più lento per quanto riguarda i tempi di training, soprattuto
+se viene utilizzato il kernel radial basis function. Decision tree è
+quello più veloce.
+
+Da questa tabella emerge chiaramente come le performace migliori si pagano in termini di complessità del modello e tempi di training.
