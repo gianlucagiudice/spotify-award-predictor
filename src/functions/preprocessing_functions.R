@@ -342,7 +342,7 @@ build_term_frequency_matrix <- function(df, plot_graph) {
 }
 
 plot_wordcloud <- function(df, image_name){
-  wordcloud_df = df
+  wordcloud_df = subset(df, occurrence > TERM_FREQUENCY_THLD)
   wordcloud_df$word = rownames(wordcloud_df)
   wordcloud_df$frew = wordcloud_df$occurrence
   wordcloud_df = subset(wordcloud_df, select = c(2,3))
