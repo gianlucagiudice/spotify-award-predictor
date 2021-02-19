@@ -63,7 +63,8 @@ TODO: I parametri di cp non sono veri.
 \end{table}
 
 I valori in grassetto nella tabella sono gli iperparametri ottimali.
-Per quanto riguarda il parametro complexity parameter di decision tree, l'insieme dei valori non è stato scelto manualmente.
+Per quanto riguarda il parametro complexity parameter di decision
+tree, l'insieme dei valori non è stato scelto manualmente.
 
 
 \section{Misure di performance}
@@ -120,9 +121,16 @@ component analysis.
 \end{figure}
 
 \subsection{Complexity Parameter}
-Il complexity parameter influisce direttamente sulla complessità dell'albero. In questo senso per complessità si fa riferimento alla VC-dimension, ciò si riflette direttamente sulla struttura dell'albero. Nel caso preso in esame vengono considerati differenti valori per il complexity parameter (elencati in \autopageref{tab:iperparametri}).
+Il complexity parameter influisce direttamente sulla complessità
+dell'albero. In questo senso per complessità si fa riferimento alla
+VC-dimension, ciò si riflette direttamente sulla struttura
+dell'albero. Nel caso preso in esame vengono considerati differenti
+valori per il complexity parameter (elencati in
+\autopageref{tab:iperparametri}).
 
-Nell'immagine seguente vengono mostrate le differenti performance dell'albero, utilizzando la metrica ROC, al variare del comlexity parameter.
+Nell'immagine seguente vengono mostrate le differenti performance
+dell'albero, utilizzando la metrica ROC, al variare del complexity
+parameter.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=8cm]{../images/rpart_cp_plot.png}
@@ -148,7 +156,7 @@ Nell'immagine seguente vengono mostrate le differenti performance dell'albero, u
 \subfloat[Decision tree.]{
 	\begin{minipage}[c]{\textwidth}
 		\centering
-		\includegraphics[width=7cm]{../images/svmLinear_class_performance.png}
+		\includegraphics[width=7cm]{../images/rpart_class_performance.png}
 \end{minipage}}
 
 \caption{Performance dei modelli distinguendo tra classe positiva e negativa.}
