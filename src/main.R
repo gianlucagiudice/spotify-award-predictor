@@ -1,8 +1,8 @@
 ### ------- Load custom functions -------
-INSTALL_LIBRARIES <- TRUE
-DUMP_MODEL <- TRUE
-TRAIN_MODEL <- FALSE
-PLOT_GRAPHS <- FALSE
+INSTALL_LIBRARIES <- TRUE ## install libraries if not already installed
+DUMP_MODEL <- TRUE ## save model after training
+TRAIN_MODEL <- TRUE ## if false uses previously dumped models
+PLOT_GRAPHS <- TRUE ## weather or not to plot graphs
 
 source('src/functions/libraries.R')
 source('src/functions/preprocessing_functions.R')
@@ -102,4 +102,3 @@ models_statistics <- compare_statistics(dataframe = df.out,
                                         num_cores = NUM_CORES)
 
 plot_comparison(models_statistics)
-##compare_statistics(df.out, "rpart", "svmRadial", SEED, N_FOLDS, N_REPEATS)
