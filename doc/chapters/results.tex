@@ -106,6 +106,46 @@ ragionevole rispetto alla potenza computazionale in nostro possesso.
 \subsection{Complexity Parameter}
 \subsection{Decision Tree Plot}
 \subsection{Risultati esperimenti}
+\subsubsection{Performance classe positiva vs negativa}
+\begin{figure}[H]
+	  \subfloat[SVM - RBF.]{
+	\begin{minipage}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=7cm]{../images/svmRadial_class_performance.png}
+\end{minipage}}
+\hfill 	
+\subfloat[SVM - Linear.]{
+	\begin{minipage}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=7cm]{../images/svmLinear_class_performance.png}
+\end{minipage}}
+
+\subfloat[Decision tree.]{
+	\begin{minipage}[c]{\textwidth}
+		\centering
+		\includegraphics[width=7cm]{../images/svmLinear_class_performance.png}
+\end{minipage}}
+
+\caption{Performance dei modelli distinguendo tra classe positiva e negativa.}
+\end{figure}
+
+\subsubsection{Performance macro average}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=4.25cm]{../images/svmRadial_performance.png}
+		\caption{SVM - RBF.}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=4.25cm]{../images/svmLinear_performance.png}
+		\caption{SVM - Linear.}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=4.25cm]{../images/rpart_performance.png}
+		\caption{Decision tree.}
+	\end{subfigure}
+	\caption{Performance dei modelli (macro average).}
+\end{figure}
 
 
 \begin{table}[H]
@@ -135,7 +175,7 @@ ragionevole rispetto alla potenza computazionale in nostro possesso.
 			\hline
 			& \textbf{Accuracy} & \textbf{Precision} &\textbf{ Recall }	& \textbf{F1} &\textbf{ AUC} \\
 			\hline
-			\textbf{SVM - RBF} & 0.61309 & 0.61640 & 0.61139  & 0.61800 & 0.66106 \\
+			\textbf{SVM - RBF} & 0.61309 & 0.61640 & 0.61139  & 0.61800 & \textbf{0.66106} \\
 			\textbf{SVM - Linear} & 0.61771 & 0.62503 & 0.61774 & 0.62136 & 0.65601 \\
 			\textbf{Decision tree} & 0.59592 & 0.62921 & 0.59571 	& 0.61285 & 0.59734\\
 			\hline

@@ -191,9 +191,8 @@ plot_performance <- function(cm, positive, negative, method){
            aes(x = factor(metric,
                           level = c('Accuracy', 'Precision', 'Recall', 'F1')),
                y = score)) +
-        ggtitle("Perfomance - Overall (macro average)") +
+        ggtitle("Overall (macro average)") +
         labs(fill="Award") +
-        coord_flip() +
         xlab("Metric") + ylab("Score") + 
         geom_col(colour="black", fill="blue", position="dodge") +
         scale_y_continuous(breaks=seq(0, 1, 0.025)) +
@@ -202,7 +201,7 @@ plot_performance <- function(cm, positive, negative, method){
     
     filename = paste(method, "_performance.png", sep="")
     ggsave(filename, plot = last_plot(), path = "images",
-           height=15, width=25, units="cm",
+           height=25, width=10, units="cm",
            scale = SCALE, dpi = floor(DPI), limitsize = TRUE)
 }
 
