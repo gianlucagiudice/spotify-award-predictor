@@ -5,7 +5,7 @@ effettuata un'analisi esplorativa.
 
 \section{Acquisizione del dataset}
 Il dataset completo contenente sia le informazioni sui singoli
-musicali che le etichette delle istanze in esso contenuto non è
+musicali che le etichette associate ad ogni istanza non è
 disponibile da una sola sorgente. Pertanto abbiamo ottenuto le
 informazioni necessarie da diversi sorgenti per poi integrarle in un
 unico dataset.
@@ -19,9 +19,9 @@ Con questa tecnica sono stati ottenuti i dati relativi ai brani, un utente ha qu
 	{https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks}
 	{https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks}.}.
 
-Il dataset contenente queste informazioni è il file: \verb|data/raw/to_integrate/data.csv|
+Il dataset contenente queste informazioni è il file: \verb|data/raw/to_integrate/data.csv|.
 \subsection{Premi canzoni - Wikipedia}
-Le informazioni riguardo i premi delle canzoni, ovvero le varie certificazioni vinte, sono disponibili su \href{https://it.wikipedia.org//}{wikipedia.org}. Questa informazione costituisce di fatto l'etichetta per classificare ogni brano musicale.
+Le informazioni riguardo i premi delle canzoni, ovvero le varie certificazioni vinte, sono disponibili su \href{https://it.wikipedia.org//}{wikipedia.org}. Questa informazione costituisce di fatto l'etichetta per classificare ogni brano musicale come di successo o non di successo..
 
 Nello specifico siamo interessati a:
 \begin{itemize}
@@ -84,7 +84,7 @@ brani musicali che hanno vinto un premio e classe negativa per i brani
 che non hanno vinto un premio.
 \subsection{Spotify}
 \label{sec:descrizione_spotify}
-Di seguito viene descritto il dataset proveniente da kaggle, ovvero quello contenente le informazioni dei brani.
+Di seguito viene descritto il dataset proveniente da kaggle, quindi quello contenente le informazioni dei brani.
 
 \begin{center}
 	
@@ -188,8 +188,8 @@ fatta solo nel contesto della attivitá di scraping, in quanto i brani
 sono così rappresentati sul sito di wikipedia. Tuttavia da questo
 punto in poi non verrà più tenuto conto di questa informazione,
 infatti un singolo verrà considerato come\textbf{ vincitore di un
-  premio} (e quindi di successo) oppure come \textbf{non vincitore di
-  un premio} (non di successo).
+  premio} (quindi di successo) oppure come \textbf{non vincitore di
+  un premio} (non di successo). I brani musicali vincitori di un premio appartengono alla classe positiva, viceversa quelli che non hanno vinto un premio alla classe negativa.
 
 Il risultato dello scraping della tabella di wikipedia è il seguente:
 
@@ -238,10 +238,10 @@ Il risultato dello scraping della tabella di wikipedia è il seguente:
 \section{Data integration}
 Date queste due sorgenti dati, è necessario integrare i dati allo
 scopo di avere un dataset etichettato, le label saranno appunto se un
-bravo ha vinto un premio (quindi è di successo) oppure no.
+brano musicale ha vinto un premio (quindi è di successo) oppure no.
 
 La strategia di entity resolution adottata è considerare un singolo
-musicale come una singola identità basandosi sul titolo e gli artisti
+musicale come una singola entità basandosi sul titolo e gli artisti
 di una canzone. Se il nome del brano musicale è lo stesso e gli
 artisti coincidono, allora il brano è il medesimo.
 
@@ -254,7 +254,7 @@ vengono effettuati i seguenti passi:
 	\item Import dei dataset in mongodb, inizialmente in due collezioni diverse.
 	\item Normalizzazione dei dati, i campi di join vengono trasformati in lowercase.
 	\item Creazione indici.
-	\item Entrambe le collezioni hanno il campo "artisti" il quale consiste in una stringa contenente la lista degli artisti separati dal carattere ",". Viene quindi eseguito l'unfold del campo "artista" in entrambe le collezioni, costruendo una lista di per ogni documento facendo uno split sul carattere ",".
+	\item Entrambe le collezioni hanno il campo "artisti" il quale consiste in una stringa contenente la lista degli artisti separati dal carattere ",". Viene quindi eseguito l'unfold del campo "artista" in entrambe le collezioni, costruendo una lista di artisti per ogni documento facendo uno split sul carattere ",".
 	\item Viene eseguite la join sul campo titolo considerando un match valido se l'intersezione tra gli insiemi di artisti dei documenti delle due collezioni non è vuota.
 	\item Viene ritrasformato il campo artista appiattendo la lista e rappresentando l'insieme degli artisti di un brano come una stringa, separando ogni artista con il carattere ",".
 	\item Dump del database in un file .csv, questo è il dataset integrato e verrà usato per il training dei modelli.
@@ -379,7 +379,7 @@ esame, pertanto il campo viene scartato.
 
 Anche se il campo non viene effettivamente utilizzato, è interessante
 analizzare la distribuzione dei valori di popolarità delle canzoni nel
-dataset. Inoltre assumiamo che per il problema trattato, si vogliono
+dataset. Inoltre assumiamo che per il problema trattato, si vogliano
 classificare delle canzoni che non sono completamente
 sconosciute. Sarebbe infatti irrealistico pensare che un singolo
 musicale del tutto sconosciuto vinca dal nulla una certificazione,
@@ -409,7 +409,7 @@ canzoni nel dataset.
 \end{figure}
 
 Analizzando la distribuzione dei valori della popolarità si
-considerano il primo, secondo e terzo quartile rispettivamente:
+considerano il primo, secondo e terzo quartile, rispettivamente:
 $q_{1/4} = 49; \; q_{2/4}= 57; \; q_{3/4} = 65$. Inoltre i valori di
 media e deviazione standard sono: $\mu = 57.83; \; \sigma = 10.12$.
 
@@ -607,7 +607,7 @@ spiegando la maggior parte della varianza.
 
 La PCA viene effettuata solo sulle features numeriche, si noti inoltre
 come il dataset è stato precedentemente standardizzato, in questo modo
-i valori numerici hanno media $0$ e deviazione standard $1$. Questa è
+i valori numerici hanno media $0$ e varianza $1$. Questa è
 una condizione necessaria per applicare correttamente la tecnica PCA.
 
 A partire dalla matrice di covarianza viene effettuata la
