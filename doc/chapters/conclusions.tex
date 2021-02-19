@@ -1,23 +1,19 @@
 \chapter{Conclusioni}
+Le performance migliori basandosi su metrica ROC si ottengono con SVM utilizzando kernel rbf. Secondo questa metrica i modelli SVM sono effettivamente migliori rispetto a decision tree. Anche se SVM con kernel rbf ha performance migliori rispetto a SVM con kernel lineare, di fatto le performance sono molto simili. Questo piccolo miglioramento si paga in termini di complessità del modello e tempo di training.
 
-Perchè le performance sono basee?
-
-Spotify genera le caratteristiche con un algorimto quindi sicuramente un po' approssimato
-
-E' effittivamente difficile capire se una canzone vincerà un premio, dipende da molti fattori.
+Nel complesso le performance dei modelli sono piuttosto basse. Riuscire a distinguere se un brano diventerà di successo oppuire no è un'operazione non banale anche per gli umani. Anche per questo motivo le performance dei modelli sono relativamente basse. Tuttavia ci sono anche altri fattori che possono influire negativamente sulle performance.
 
 Il dataset potrebbe essere ampliato per esempio aggiungendo il genere
-musicale di ogni brano. Una analisi statistica potrebbe probabilmente
-trovare una correlazione tra generi piú popolari e la vittoria di un
-premio basato sul numero di vendite e/o ascolti.
+musicale di ogni brano. Potrebbe infatti esistere una correlazione 
+statistica tra generi piú popolari e la vittoria di un premio da parte di una canzone.
 
-Sarebbe interessante procedere con una analisi semantica del testo
-delle canzoni (dove presente) e valutare se un testo appartenente ad
-un certo 'tema' (per esempio una canzone d'amore) la porta ad avere
+
+La probabilitá di successo di un singolo sono influenzate anche da fattori non presenti nel nostro dataset. Per esempio se una
+canzone viene utilizzate in un film o pubblicitá televisiva questo
+accrescerà la sua popolarità e probabilmente anche il suo numero di
+ascolti.
+
+Inoltre sarebbe interessante utilizzare  tecniche di NLP per estratte informazioni riguardo la lyrics di un brano 
+e valutare se un testo riguardante un particolare 'tema' (per esempio una canzone d'amore) la porta ad avere
 piú successo rispetto ad altre.
 
-La probabilitá di successo di un singolo sono influenzate da fattori
-probabilmente non presenti nel nostro dataset. Per esempio se una
-canzone viene utilizzate in un film o pubblicitá televisiva questo
-accrescerá la sua popolarità e probabilmente anche il suo numero di
-ascolti.
