@@ -218,13 +218,12 @@ plot_cm <- function(cm, method){
         scale_fill_gradient(low = "white", high = "steelblue",
                             limits=c(0, max(cm$Freq))) +
         geom_text(aes(x = Reference, y = Prediction, label = Freq)) +
-        ggtitle("Confusion matrix") +
         xlab("Reference") + ylab("Prediction") + 
         theme(plot.title = element_text(hjust = 0.5))
     
     filename = paste(method, "_cm.png", sep="")
     ggsave(filename, plot = last_plot(), path = "images",
-           scale = 0.5, dpi = floor(DPI), limitsize = TRUE)
+           scale = 0.4, dpi = floor(DPI), limitsize = TRUE)
 }
 
 
