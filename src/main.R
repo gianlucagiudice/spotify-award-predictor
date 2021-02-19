@@ -102,3 +102,4 @@ models_statistics <- compare_statistics(dataframe = df.out,
                                         num_cores = NUM_CORES)
 
 plot_comparison(models_statistics)
+plot_decision_tree(models_statistics$rpart)

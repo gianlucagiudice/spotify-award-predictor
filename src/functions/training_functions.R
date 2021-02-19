@@ -333,13 +333,13 @@ compare_statistics <- function (dataframe, methods_list, tune_grid_list,
 
 plot_decision_tree <- function (decision_tree_model) {
 
-    png("images/decision_tree_plot.png")
+    png("./images/rpart_cp_plot.png")
+    print(plot(decision_tree_model))
+    dev.off()
+    
+    png("./images/rpart_plot.png")
     rpart.plot(decision_tree_model$finalModel)
     dev.off()
-
-    png("images/decision_tree_cp_plot.png")
-    plot(decision_tree_model)
-    dev.off()    
 }
 
 plot_comparison <- function(models_statistics){
@@ -358,14 +358,5 @@ plot_comparison <- function(models_statistics){
     png("./images/compare_splom_plot.png",
         res = RES, width = 20, height = 20, units = "cm")
     print(splom(cv.values, metric = "ROC"))
-    dev.off()
-    
-    # Decision tree
-    png("./images/rpart_cp_plot.png")
-    print(plot(models_statistics$rpart))
-    dev.off()
-        
-    png("./images/rpart_plot.png")
-    rpart.plot(models_statistics$rpart$finalModel)
     dev.off()
 }
