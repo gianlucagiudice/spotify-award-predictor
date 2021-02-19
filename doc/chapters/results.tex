@@ -207,7 +207,7 @@ Dalle curve ROC e la misura di AUC é possibile rendersi conto che i
 classificatori non sono molto efficaci, un valore di AUC di 0.5
 significa che il nostro classificatore ha le stesse capacitá
 predittive di un classificatore che classifica in maniera casuale. Il
-classificatore migliore risulta essere la support vecotor machine con
+classificatore migliore risulta essere la support vector machine con
 kernel radiale mentre il peggiore risulta essere il decision tree
 ottenuto tramite rpart.
 
@@ -299,15 +299,28 @@ Dall'immagine sopra possiamo notare come fissato un intervallo di confidenza ugu
 	\label{fig:compare_splom_plot}
 \end{figure}
 
-Come spiegato in precedentemente, il confronto viene effettuato eseguendo per 3 volte una 10-folds cross validation. Quindi alla fine si ottengono 30 stime di performance per ogni modello, ognuna delle quali è il risultato del training di uno specifico fold. In \autoref{fig:compare_dot_plot} vengono mostate le stime di performance utilizzando ognuno dei 30 folds. In modo coerente a quanto visto in \autoref{fig:compare_splom_plot} notiamo che SVM con kernel rbf è decisamente meglio a decision tree, infatti praticamente per ogni fold ottiene performance migliori. Anche per quanto riguarda il confronto tra SVM con kernel rbf e lineare, il modello con kernel rbf ottiene performance migliori sulla maggior parte dei folds. Nel caso in cui avessimo avuto due modelli con i 30 folds distribuiti sulla bisetrice di un quadrante, in quel caso i modelli sarebbero stati identici.
+Come spiegato in precedentemente, il confronto viene effettuato
+eseguendo per 3 volte una 10-folds cross validation. Quindi alla fine
+si ottengono 30 stime di performance per ogni modello, ognuna delle
+quali è il risultato del training di uno specifico fold. In
+\autoref{fig:compare_dot_plot} vengono mostate le stime di performance
+utilizzando ognuno dei 30 folds. In modo coerente a quanto visto in
+\autoref{fig:compare_splom_plot} notiamo che SVM con kernel rbf è
+decisamente migliore di decision tree, infatti praticamente per ogni
+fold ottiene performance migliori. Anche per quanto riguarda il
+confronto tra SVM con kernel rbf e lineare, il modello con kernel rbf
+ottiene performance migliori sulla maggior parte dei folds. Nel caso
+in cui avessimo avuto due modelli con i 30 folds distribuiti sulla
+bisetrice di un quadrante, in quel caso i modelli sarebbero stati
+identici.
 
 \subsection{Confronto Timings}
-Di seguito vengono mostrati i tempi di training per i modelli (espressi in secondi).
-La colonna
-Everything si riferisce al training con la tecnica 10-fold cross
-validation mentre final model indica il training del modello
-utilizzando tutto il dataset. Per la fase di training vengono
-sfruttati più cores in modo tale da ridurre i tempi di training.
+Di seguito vengono mostrati i tempi di training per i modelli
+(espressi in secondi).  La colonna Everything si riferisce al training
+con la tecnica 10-fold cross validation mentre final model indica il
+training del modello utilizzando tutto il dataset. Per la fase di
+training vengono sfruttati più cores in modo tale da ridurre i tempi
+di training.
 
 \begin{table}[H]
 	\begin{center}
