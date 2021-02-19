@@ -125,6 +125,7 @@ valori per il complexity parameter (elencati in \autoref{tab:iperp}).
 Nell'immagine seguente vengono mostrate le differenti performance
 dell'albero, utilizzando la metrica ROC, al variare del complexity
 parameter.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=7cm]{../images/rpart_cp_plot.png}
@@ -211,7 +212,11 @@ classificatore migliore risulta essere la support vector machine con
 kernel radiale mentre il peggiore risulta essere il decision tree
 ottenuto tramite rpart.
 
-Un altro aspetto interessante è il fatto che la curva ROC mostra il rapporto dei falsi positivi e il rapporto dei veri positivi al variare del cutoff scelto. Questo permette di scegliere un cutoff in modo tale da bilanciare i falsi positivi e veri negativi secondo le esigenze di dominio.
+Un altro aspetto interessante è il fatto che la curva ROC mostra il
+rapporto dei falsi positivi e il rapporto dei veri positivi al variare
+del cutoff scelto. Questo permette di scegliere un cutoff in modo tale
+da bilanciare i falsi positivi e veri negativi secondo le esigenze di
+dominio.
 
 Viene qui mostrata l'accuracy dei modelli al variare del cutoff:
 
@@ -278,9 +283,16 @@ Viene qui mostrata l'accuracy dei modelli al variare del cutoff:
 
 \section{Modelli a confronto}
 \label{sec:modelli_confronto}
-Per confrontare i modelli viene utilizzata la tecnica 10-folds cross validation con 3 ripetizioni. Questo vuol dire ripetere la 10-folds cross validation per 3 volte generando folds differenti. Con questa tecnica si ottenengono stime di performance più accurate, a discapito dei tempi di training. 
+Per confrontare i modelli viene utilizzata la tecnica 10-folds cross
+validation con 3 ripetizioni. Questo vuol dire ripetere la 10-folds
+cross validation per 3 volte generando folds differenti. Con questa
+tecnica si ottenengono stime di performance più accurate, a discapito
+dei tempi di training.
 
-Un aspetto importante è che i folds vengono generati in modo identico per il training di ogni modello. In questo modo è possibile mettere a confronto le performance ottenute da ogni modelli in maniera statisticamente valida.
+Un aspetto importante è che i folds vengono generati in modo identico
+per il training di ogni modello. In questo modo è possibile mettere a
+confronto le performance ottenute da ogni modelli in maniera
+statisticamente valida.
 
 \subsection{Confronto secondo metrica ROC}
 
@@ -311,8 +323,7 @@ fold ottiene performance migliori. Anche per quanto riguarda il
 confronto tra SVM con kernel rbf e lineare, il modello con kernel rbf
 ottiene performance migliori sulla maggior parte dei folds. Nel caso
 in cui avessimo avuto due modelli con i 30 folds distribuiti sulla
-bisetrice di un quadrante, in quel caso i modelli sarebbero stati
-identici.
+bisetrice di un quadrante allora i modelli sarebbero stati identici.
 
 \subsection{Confronto Timings}
 Di seguito vengono mostrati i tempi di training per i modelli
@@ -337,9 +348,9 @@ di training.
 	\caption{Tempi per il training dei modelli.}
 \end{table}
 
-Il modello support vector machine
-risulta più lento per quanto riguarda i tempi di training, soprattuto
-se viene utilizzato il kernel radial basis function. Decision tree è
-quello più veloce.
+Il modello support vector machine risulta più lento per quanto
+riguarda i tempi di training, soprattuto se viene utilizzato il kernel
+radial basis function. Decision tree è quello più veloce.
 
-Da questa tabella emerge chiaramente come le performace migliori si pagano in termini di complessità del modello e tempi di training.
+Da questa tabella emerge chiaramente come le performace migliori si
+pagano in termini di complessità del modello e tempi di training.
