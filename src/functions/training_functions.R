@@ -360,8 +360,12 @@ plot_comparison <- function(models_statistics){
     print(splom(cv.values, metric = "ROC"))
     dev.off()
     
+    # Decision tree
     png("./images/rpart_cp_plot.png")
     print(plot(models_statistics$rpart))
     dev.off()
-    
+        
+    png("./images/rpart_plot.png")
+    rpart.plot(models_statistics$rpart$finalModel)
+    dev.off()
 }
